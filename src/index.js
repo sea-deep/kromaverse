@@ -188,17 +188,25 @@ app.get('/api/pixels', async (req, res) => {
 
 // ==================== SOCKET.IO ====================
 io.on('connection', (socket) => {
-  const session = socket.request.session;
-  const userId = session?.userId?.toString() || null;
-  
-  console.log(`User connected: ${userId || 'anonymous'}`);
+  const logUserId = () => {
+    const currentId = socket.request.session?.userId?.toString() || null;
+    console.log(`User connected: ${currentId || 'anonymous'}`);
+  };
+  logUserId();
   
   socket.on('place_pixel', async ({ x, y, color }) => {
     try {
-      // Validate authentication
-      if (!userId) {
-        return socket.emit('err', 'not-auth');
-      }
+      // Reload session to pick up latest login state
+      const freshUserId = await new Promise((resolve) => {
+        const sess = socket.request.session;
+        if (sess && typeof sess.reload === 'function') {
+          sess.reload(() => resolve(sess?.userId?.toString() || null));
+        } else {
+          resolve(sess?.userId?.toString() || null);
+        }
+      });
+      
+      if (!freshUserId) return socket.emit('err', 'not-auth');
       
       // Validate coordinates
       if (typeof x !== 'number' || typeof y !== 'number') {
@@ -215,7 +223,7 @@ io.on('connection', (socket) => {
       }
       
       // Get user
-      const user = await User.findById(userId);
+      const user = await User.findById(freshUserId);
       if (!user) {
         return socket.emit('err', 'user-not-found');
       }
@@ -258,7 +266,8 @@ io.on('connection', (socket) => {
   });
   
   socket.on('disconnect', () => {
-    console.log(`User disconnected: ${userId || 'anonymous'}`);
+    const currentId = socket.request.session?.userId?.toString() || null;
+    console.log(`User disconnected: ${currentId || 'anonymous'}`);
   });
 });
 
