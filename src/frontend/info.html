@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Info - KromaVerse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <meta name="description" content="Learn about KromaVerse - A collaborative pixel art canvas" />
+  <link rel="stylesheet" href="main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .info-page {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .info-content {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-md);
+      border: 2px solid var(--border-light);
+    }
+    .info-content h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.5rem;
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+    }
+    .info-content h2 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.8rem;
+      color: var(--text-primary);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-light);
+    }
+    .info-content h3 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.3rem;
+      color: var(--text-primary);
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .info-content p {
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+    .info-content ul, .info-content ol {
+      margin: 1rem 0 1.5rem 1.5rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+    .info-content li {
+      margin-bottom: 0.5rem;
+    }
+    .info-content strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .highlight-box {
+      background: var(--bg-secondary);
+      border-left: 4px solid var(--accent-secondary);
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      margin: 1.5rem 0;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 0.875rem 2rem;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, #ff8fb3 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      margin-top: 1rem;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    @media (max-width: 768px) {
+      .info-page {
+        padding: 1rem;
+      }
+      .info-content {
+        padding: 1.5rem;
+      }
+      .info-content h1 {
+        font-size: 2rem;
+      }
+      .info-content h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🎨</span>
+      <span class="brand-text">KromaVerse</span>
+    </div>
+    <div id="mobileAuth" class="mobile-auth" style="display:none;"></div>
+    <nav class="menu">
+      <a href="/" class="menu-link">
+        <span class="menu-icon">🏠</span>
+        <span>Canvas</span>
+      </a>
+      <a href="/info" class="menu-link">
+        <span class="menu-icon">ℹ️</span>
+        <span>Info</span>
+      </a>
+      <a href="/docs" class="menu-link">
+        <span class="menu-icon">📚</span>
+        <span>Docs</span>
+      </a>
+      <a href="https://github.com/sea-deep/kromaverse" target="_blank" rel="noopener noreferrer" class="menu-link">
+        <span class="menu-icon">🐙</span>
+        <span>GitHub</span>
+      </a>
+    </nav>
+  </header>
+
+  <main class="info-page">
+    <div class="info-content">
+      <h1>🎨 Welcome to KromaVerse</h1>
+      <p>KromaVerse is a collaborative pixel art canvas where creativity meets community. Place pixels, create art, and watch the canvas evolve in real-time with artists from around the world!</p>
+
+      <div class="highlight-box">
+        <strong>🌟 Experience the magic of collaborative creation!</strong> Every pixel you place becomes part of a living, breathing digital canvas shared by everyone.
+      </div>
+
+      <h2>🎮 How to Play</h2>
+      
+      <h3>1. Create an Account</h3>
+      <p>Click the <strong>Login</strong> or <strong>Register</strong> button to create your account. Just pick any username and password - it's that simple! Two users can't have the same username, but that's the only rule.</p>
+
+      <h3>2. Select Your Color</h3>
+      <p>Choose from 11 vibrant preset colors or use the custom color picker (the rainbow square) to select any color you want. Your selected color appears in the preview box below the palette.</p>
+
+      <h3>3. Place Your Pixels</h3>
+      <ul>
+        <li><strong>Desktop:</strong> Click on any cell in the 64×64 grid to place a pixel</li>
+        <li><strong>Mobile:</strong> Tap on any cell to place your pixel</li>
+        <li>You can place one pixel every <strong>3 seconds</strong></li>
+        <li>Watch the timer in the canvas toolbar to see when you can place your next pixel</li>
+      </ul>
+
+      <h3>4. Navigate the Canvas</h3>
+      <ul>
+        <li><strong>Zoom In/Out:</strong> Use the + and - buttons or scroll with your mouse wheel</li>
+        <li><strong>Pan:</strong> Click and drag to move around the canvas (or use touch gestures on mobile)</li>
+        <li><strong>Reset View:</strong> Click the ⟲ button to return to the center</li>
+        <li><strong>Mobile:</strong> Pinch to zoom, swipe to pan</li>
+      </ul>
+
+      <h2>✨ Features</h2>
+      <ul>
+        <li><strong>Real-time Collaboration:</strong> See pixels appear instantly as other artists place them</li>
+        <li><strong>Simple & Fun:</strong> No complex rules, just pure creative expression</li>
+        <li><strong>Cross-Platform:</strong> Works seamlessly on desktop and mobile devices</li>
+        <li><strong>Persistent Canvas:</strong> Your art stays on the canvas and evolves over time</li>
+        <li><strong>Custom Colors:</strong> Choose from presets or pick any color from the spectrum</li>
+      </ul>
+
+      <h2>📱 Mobile Tips</h2>
+      <ul>
+        <li>Use the <strong>Hide Palette</strong> button at the bottom to maximize your canvas space</li>
+        <li>The cooldown timer appears in the canvas header for easy tracking</li>
+        <li>Tap the 👤/🔐 icon in the top-right to login or view your account</li>
+        <li>Drag with one finger to pan, pinch with two to zoom</li>
+      </ul>
+
+      <h2>🎯 Community Guidelines</h2>
+      <p>KromaVerse is a shared space for everyone to enjoy. While we encourage creative freedom, please be respectful of other artists and their work. Have fun, be creative, and contribute to something amazing!</p>
+
+      <div class="highlight-box">
+        <strong>💡 Pro Tip:</strong> Collaborate with others to create larger artworks! Coordinate in the community to build something spectacular together.
+      </div>
+
+      <a href="/" class="cta-button">Start Creating Now! 🎨</a>
+    </div>
+  </main>
+</body>
+</html>

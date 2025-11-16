@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Documentation - KromaVerse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <meta name="description" content="Technical documentation for KromaVerse" />
+  <link rel="stylesheet" href="main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .docs-page {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .docs-content {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      box-shadow: var(--shadow-md);
+      border: 2px solid var(--border-light);
+    }
+    .docs-content h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.5rem;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+    .docs-content .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+    .docs-content h2 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.8rem;
+      color: var(--text-primary);
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-light);
+    }
+    .docs-content h3 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.4rem;
+      color: var(--text-primary);
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .docs-content h4 {
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .docs-content p {
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+    .docs-content ul, .docs-content ol {
+      margin: 1rem 0 1.5rem 1.5rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+    .docs-content li {
+      margin-bottom: 0.5rem;
+    }
+    .docs-content code {
+      background: var(--bg-secondary);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      color: var(--accent-primary);
+    }
+    .docs-content pre {
+      background: var(--bg-secondary);
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      margin: 1rem 0;
+      border: 2px solid var(--border-light);
+    }
+    .docs-content pre code {
+      background: none;
+      padding: 0;
+      color: var(--text-primary);
+    }
+    .docs-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    .docs-content th {
+      background: var(--bg-secondary);
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      border: 2px solid var(--border-light);
+    }
+    .docs-content td {
+      padding: 0.75rem;
+      border: 2px solid var(--border-light);
+    }
+    .info-box {
+      background: var(--bg-secondary);
+      border-left: 4px solid var(--accent-secondary);
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      margin: 1.5rem 0;
+    }
+    .warning-box {
+      background: #fffaf0;
+      border-left: 4px solid var(--warning);
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .docs-page {
+        padding: 1rem;
+      }
+      .docs-content {
+        padding: 1.5rem;
+      }
+      .docs-content h1 {
+        font-size: 2rem;
+      }
+      .docs-content h2 {
+        font-size: 1.5rem;
+      }
+    }
+    @media print {
+      .topbar {
+        display: none;
+      }
+      .docs-page {
+        padding: 0;
+      }
+      .docs-content {
+        box-shadow: none;
+        border: none;
+        padding: 1rem;
+      }
+      .docs-content h1, .docs-content h2 {
+        page-break-after: avoid;
+      }
+      pre, table {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🎨</span>
+      <span class="brand-text">KromaVerse</span>
+    </div>
+    <div id="mobileAuth" class="mobile-auth" style="display:none;"></div>
+    <nav class="menu">
+      <a href="/" class="menu-link">
+        <span class="menu-icon">🏠</span>
+        <span>Canvas</span>
+      </a>
+      <a href="/info" class="menu-link">
+        <span class="menu-icon">ℹ️</span>
+        <span>Info</span>
+      </a>
+      <a href="/docs" class="menu-link">
+        <span class="menu-icon">📚</span>
+        <span>Docs</span>
+      </a>
+      <a href="https://github.com/sea-deep/kromaverse" target="_blank" rel="noopener noreferrer" class="menu-link">
+        <span class="menu-icon">🐙</span>
+        <span>GitHub</span>
+      </a>
+    </nav>
+  </header>
+
+  <main class="docs-page">
+    <div class="docs-content">
+      <h1>📚 KromaVerse Technical Documentation</h1>
+      <p class="subtitle">Version 1.0.0 | Last Updated: November 2025</p>
+
+      <h2>1. Project Overview</h2>
+      <p>KromaVerse is a collaborative real-time pixel art canvas built with modern web technologies. It enables multiple users to place colored pixels on a shared 64×64 grid, creating a dynamic and ever-evolving digital artwork space.</p>
+
+      <h3>1.1 Key Features</h3>
+      <ul>
+        <li>Real-time collaborative pixel placement using WebSocket connections</li>
+        <li>User authentication and session management</li>
+        <li>3-second cooldown period between pixel placements</li>
+        <li>Responsive design optimized for desktop and mobile devices</li>
+        <li>Persistent data storage in MongoDB</li>
+        <li>11 preset colors plus custom color picker</li>
+      </ul>
+
+      <h3>1.2 Technology Stack</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Technology</th>
+            <th>Version</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Backend Runtime</td>
+            <td>Node.js</td>
+            <td>18+</td>
+          </tr>
+          <tr>
+            <td>Web Framework</td>
+            <td>Express.js</td>
+            <td>5.1.0</td>
+          </tr>
+          <tr>
+            <td>Real-time Engine</td>
+            <td>Socket.IO</td>
+            <td>4.8.1</td>
+          </tr>
+          <tr>
+            <td>Database</td>
+            <td>MongoDB</td>
+            <td>8.x</td>
+          </tr>
+          <tr>
+            <td>ODM</td>
+            <td>Mongoose</td>
+            <td>8.19.4</td>
+          </tr>
+          <tr>
+            <td>Session Store</td>
+            <td>connect-mongo</td>
+            <td>5.1.0</td>
+          </tr>
+          <tr>
+            <td>Password Hashing</td>
+            <td>bcryptjs</td>
+            <td>3.0.3</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Architecture</h2>
+
+      <h3>2.1 System Architecture</h3>
+      <p>KromaVerse follows a client-server architecture with real-time bidirectional communication:</p>
+      <ul>
+        <li><strong>Client:</strong> Vanilla JavaScript SPA with Socket.IO client</li>
+        <li><strong>Server:</strong> Node.js/Express with Socket.IO server</li>
+        <li><strong>Database:</strong> MongoDB for persistent storage</li>
+        <li><strong>Session Management:</strong> Express-session with MongoStore</li>
+      </ul>
+
+      <h3>2.2 Data Models</h3>
+
+      <h4>User Model</h4>
+      <pre><code>{
+  username: String (required, unique),
+  passwordHash: String (required),
+  lastPlacedAt: Date (default: null)
+}</code></pre>
+
+      <h4>Pixel Model</h4>
+      <pre><code>{
+  x: Number (0-63, required),
+  y: Number (0-63, required),
+  color: String (hex color, required),
+  user: ObjectId (ref: User, required),
+  updatedAt: Date (required)
+}</code></pre>
+
+      <h3>2.3 Directory Structure</h3>
+      <pre><code>src/
+├── index.js              # Main server file
+├── package.json          # Dependencies
+├── purge-db.js          # Database cleanup utility
+├── .env                 # Environment variables
+├── frontend/
+│   ├── index.html       # Main canvas page
+│   ├── info.html        # Information page
+│   ├── docs.html        # Documentation page
+│   ├── main.css         # Global styles
+│   └── main.js          # Client-side logic
+└── models/
+    ├── User.js          # User schema
+    └── Pixel.js         # Pixel schema</code></pre>
+
+      <h2>3. API Reference</h2>
+
+      <h3>3.1 REST API Endpoints</h3>
+
+      <h4>POST /api/register</h4>
+      <p><strong>Description:</strong> Register a new user account</p>
+      <p><strong>Request Body:</strong></p>
+      <pre><code>{
+  "username": "string",
+  "password": "string"
+}</code></pre>
+      <p><strong>Response:</strong></p>
+      <pre><code>{
+  "ok": true,
+  "user": {
+    "id": "ObjectId",
+    "username": "string"
+  }
+}</code></pre>
+
+      <h4>POST /api/login</h4>
+      <p><strong>Description:</strong> Authenticate user and create session</p>
+      <p><strong>Request Body:</strong></p>
+      <pre><code>{
+  "username": "string",
+  "password": "string"
+}</code></pre>
+      <p><strong>Response:</strong></p>
+      <pre><code>{
+  "ok": true,
+  "user": {
+    "id": "ObjectId",
+    "username": "string"
+  }
+}</code></pre>
+
+      <h4>POST /api/logout</h4>
+      <p><strong>Description:</strong> Destroy user session</p>
+      <p><strong>Response:</strong></p>
+      <pre><code>{ "ok": true }</code></pre>
+
+      <h4>GET /api/me</h4>
+      <p><strong>Description:</strong> Get current authenticated user</p>
+      <p><strong>Response:</strong></p>
+      <pre><code>{
+  "user": {
+    "_id": "ObjectId",
+    "username": "string",
+    "lastPlacedAt": "Date"
+  }
+}</code></pre>
+
+      <h4>GET /api/pixels</h4>
+      <p><strong>Description:</strong> Retrieve all placed pixels</p>
+      <p><strong>Response:</strong></p>
+      <pre><code>{
+  "pixels": [
+    {
+      "x": 0-63,
+      "y": 0-63,
+      "color": "#RRGGBB",
+      "updatedAt": "Date"
+    }
+  ]
+}</code></pre>
+
+      <h3>3.2 Socket.IO Events</h3>
+
+      <h4>Client → Server</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Payload</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>place_pixel</code></td>
+            <td><code>{ x, y, color }</code></td>
+            <td>Request to place a pixel at coordinates (x,y) with specified color</td>
+          </tr>
+          <tr>
+            <td><code>auth_probe</code></td>
+            <td>None</td>
+            <td>Check authentication status</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Server → Client</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Payload</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>pixel_update</code></td>
+            <td><code>{ x, y, color, user, updatedAt }</code></td>
+            <td>Broadcast when any pixel is placed</td>
+          </tr>
+          <tr>
+            <td><code>err</code></td>
+            <td><code>"error_code"</code></td>
+            <td>Error notification (not-auth, invalid-coords, etc.)</td>
+          </tr>
+          <tr>
+            <td><code>auth_status</code></td>
+            <td><code>{ authenticated, userId }</code></td>
+            <td>Response to auth_probe</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>4. Configuration</h2>
+
+      <h3>4.1 Environment Variables</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>MONGO</code></td>
+            <td>MongoDB connection string</td>
+            <td>mongodb://localhost:27017/kromaverse</td>
+          </tr>
+          <tr>
+            <td><code>MONGO_DB</code></td>
+            <td>Database name</td>
+            <td>kromaverse</td>
+          </tr>
+          <tr>
+            <td><code>PORT</code></td>
+            <td>Server port</td>
+            <td>3000</td>
+          </tr>
+          <tr>
+            <td><code>SESSION_SECRET</code></td>
+            <td>Session signing secret</td>
+            <td>change_this_secret_key</td>
+          </tr>
+          <tr>
+            <td><code>NODE_ENV</code></td>
+            <td>Environment mode</td>
+            <td>development</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="warning-box">
+        <strong>⚠️ Security Warning:</strong> Always use a strong, random <code>SESSION_SECRET</code> in production. Never commit <code>.env</code> files to version control.
+      </div>
+
+      <h3>4.2 Session Configuration</h3>
+      <ul>
+        <li><strong>Cookie Max Age:</strong> 24 hours</li>
+        <li><strong>Cookie Security:</strong> Secure flag enabled in production</li>
+        <li><strong>SameSite Policy:</strong> Lax</li>
+        <li><strong>HTTP Only:</strong> Enabled</li>
+        <li><strong>Store:</strong> MongoDB (connect-mongo)</li>
+      </ul>
+
+      <h2>5. Deployment</h2>
+
+      <h3>5.1 Prerequisites</h3>
+      <ul>
+        <li>Node.js 18+ installed</li>
+        <li>MongoDB 6+ running and accessible</li>
+        <li>npm or yarn package manager</li>
+      </ul>
+
+      <h3>5.2 Installation Steps</h3>
+      <pre><code># Clone the repository
+git clone https://github.com/sea-deep/kromaverse.git
+
+# Navigate to project directory
+cd kromaverse/src
+
+# Install dependencies
+npm install
+
+# Create .env file
+cp .env.example .env
+
+# Edit .env with your configuration
+nano .env
+
+# Start the server
+npm start</code></pre>
+
+      <h3>5.3 Production Deployment (Railway)</h3>
+      <ol>
+        <li>Set environment variables in Railway dashboard:
+          <ul>
+            <li><code>MONGO</code> - MongoDB Atlas connection string</li>
+            <li><code>SESSION_SECRET</code> - Strong random string</li>
+            <li><code>NODE_ENV=production</code></li>
+          </ul>
+        </li>
+        <li>Enable automatic deployments from GitHub</li>
+        <li>Railway will automatically set <code>PORT</code></li>
+      </ol>
+
+      <div class="info-box">
+        <strong>💡 Tip:</strong> Use MongoDB Atlas for managed database hosting. Free tier includes 512MB storage, sufficient for thousands of users.
+      </div>
+
+      <h2>6. Database Maintenance</h2>
+
+      <h3>6.1 Purging Database</h3>
+      <p>To reset the canvas and remove all users:</p>
+      <pre><code>node purge-db.js</code></pre>
+
+      <h3>6.2 Backup & Restore</h3>
+      <pre><code># Backup
+mongodump --uri="mongodb://..." --db=kromaverse --out=backup/
+
+# Restore
+mongorestore --uri="mongodb://..." --db=kromaverse backup/kromaverse/</code></pre>
+
+      <h2>7. Client-Side Architecture</h2>
+
+      <h3>7.1 State Management</h3>
+      <p>The client maintains the following state variables:</p>
+      <ul>
+        <li><code>user</code> - Current authenticated user object</li>
+        <li><code>selectedColor</code> - Currently selected color</li>
+        <li><code>cooldownLeft</code> - Remaining cooldown time (seconds)</li>
+        <li><code>scale</code> - Canvas zoom level</li>
+        <li><code>translateX/Y</code> - Canvas pan position</li>
+        <li><code>pixelCount</code> - Total pixels placed on canvas</li>
+      </ul>
+
+      <h3>7.2 Cooldown Mechanism</h3>
+      <p>The cooldown timer is implemented entirely on the frontend:</p>
+      <ul>
+        <li>Starts immediately when user places a pixel (3 seconds)</li>
+        <li>Counts down every second using <code>setInterval</code></li>
+        <li>Blocks pixel placement when <code>cooldownLeft > 0</code></li>
+        <li>Updates UI with countdown display</li>
+      </ul>
+
+      <div class="info-box">
+        <strong>ℹ️ Note:</strong> Server-side cooldown validation was removed for simplicity. Consider re-adding for production deployments to prevent abuse.
+      </div>
+
+      <h3>7.3 Canvas Rendering</h3>
+      <p>The 64×64 grid is rendered as a CSS Grid with the following optimizations:</p>
+      <ul>
+        <li>Cells are 10×10 pixels each</li>
+        <li>Image rendering set to pixelated/crisp-edges</li>
+        <li>Transform-based pan/zoom for hardware acceleration</li>
+        <li>Touch gesture support for mobile devices</li>
+      </ul>
+
+      <h2>8. Security Considerations</h2>
+
+      <h3>8.1 Authentication</h3>
+      <ul>
+        <li>Passwords hashed with bcrypt (10 rounds)</li>
+        <li>Sessions stored in MongoDB, not memory</li>
+        <li>Session cookies are HTTP-only to prevent XSS</li>
+        <li>Secure flag enabled in production (HTTPS only)</li>
+      </ul>
+
+      <h3>8.2 Input Validation</h3>
+      <ul>
+        <li>Pixel coordinates validated (0-63 range)</li>
+        <li>Color format validated (hex color regex)</li>
+        <li>Username uniqueness enforced at database level</li>
+      </ul>
+
+      <h3>8.3 Rate Limiting</h3>
+      <div class="warning-box">
+        <strong>⚠️ TODO:</strong> Current implementation lacks rate limiting. Consider adding:
+        <ul>
+          <li>Express rate-limit middleware for API endpoints</li>
+          <li>Socket.IO rate limiting for pixel placement</li>
+          <li>IP-based rate limiting for registration</li>
+        </ul>
+      </div>
+
+      <h2>9. Performance Optimization</h2>
+
+      <h3>9.1 Database Indexes</h3>
+      <p>The following indexes are automatically created:</p>
+      <ul>
+        <li><code>users.username</code> - Unique index for fast lookups</li>
+        <li><code>pixels.{x, y}</code> - Compound index for upsert operations</li>
+      </ul>
+
+      <h3>9.2 Frontend Optimizations</h3>
+      <ul>
+        <li>CSS Grid for efficient cell rendering</li>
+        <li>Hardware-accelerated transforms for pan/zoom</li>
+        <li>Event delegation for cell clicks</li>
+        <li>Debounced pan/zoom updates</li>
+      </ul>
+
+      <h2>10. Browser Compatibility</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Browser</th>
+            <th>Minimum Version</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chrome</td>
+            <td>90+</td>
+            <td>Fully supported</td>
+          </tr>
+          <tr>
+            <td>Firefox</td>
+            <td>88+</td>
+            <td>Fully supported</td>
+          </tr>
+          <tr>
+            <td>Safari</td>
+            <td>14+</td>
+            <td>Fully supported</td>
+          </tr>
+          <tr>
+            <td>Edge</td>
+            <td>90+</td>
+            <td>Fully supported</td>
+          </tr>
+          <tr>
+            <td>Mobile Safari</td>
+            <td>iOS 14+</td>
+            <td>Touch gestures supported</td>
+          </tr>
+          <tr>
+            <td>Chrome Mobile</td>
+            <td>90+</td>
+            <td>Touch gestures supported</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>11. Troubleshooting</h2>
+
+      <h3>11.1 Common Issues</h3>
+
+      <h4>Session not persisting</h4>
+      <ul>
+        <li>Verify <code>SESSION_SECRET</code> is set</li>
+        <li>Check MongoDB connection</li>
+        <li>Enable <code>trust proxy</code> if behind proxy (Railway, Heroku)</li>
+        <li>Ensure cookies are not blocked by browser</li>
+      </ul>
+
+      <h4>WebSocket connection fails</h4>
+      <ul>
+        <li>Check CORS configuration</li>
+        <li>Verify Socket.IO version compatibility</li>
+        <li>Check for proxy/firewall blocking WebSocket protocol</li>
+      </ul>
+
+      <h4>Database connection errors</h4>
+      <ul>
+        <li>Verify MongoDB is running</li>
+        <li>Check connection string format</li>
+        <li>Ensure database user has proper permissions</li>
+        <li>For Atlas: whitelist server IP address</li>
+      </ul>
+
+      <h2>12. Future Enhancements</h2>
+      <ul>
+        <li>Add server-side cooldown validation</li>
+        <li>Implement rate limiting</li>
+        <li>Add user profiles and statistics</li>
+        <li>Canvas history/timeline feature</li>
+        <li>Undo/redo functionality</li>
+        <li>Export canvas as PNG</li>
+        <li>Multiple canvas rooms/boards</li>
+        <li>Admin moderation tools</li>
+        <li>OAuth authentication (Google, GitHub)</li>
+        <li>Real-time user cursor positions</li>
+      </ul>
+
+      <h2>13. License & Contributing</h2>
+      <p>KromaVerse is open source software. Contributions are welcome! Please submit pull requests to the GitHub repository.</p>
+      
+      <div class="info-box">
+        <strong>Repository:</strong> <a href="https://github.com/sea-deep/kromaverse" target="_blank">github.com/sea-deep/kromaverse</a>
+      </div>
+
+      <hr style="margin: 2rem 0; border: none; border-top: 2px solid var(--border-light);">
+    </div>
+  </main>
+</body>
+</html>

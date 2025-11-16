@@ -69,6 +69,16 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/index.html'));
 });
 
+// Info page route
+app.get('/info', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/info.html'));
+});
+
+// Docs page route
+app.get('/docs', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/docs.html'));
+});
+
 // Expose session to Socket.IO
 io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
