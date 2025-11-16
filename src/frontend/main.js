@@ -32,6 +32,7 @@ let translateY = 0;
 let isPanning = false;
 let startX = 0;
 let startY = 0;
+let dragDistance = 0;
 
 // DOM Elements
 const gridEl = document.getElementById('grid');
@@ -150,12 +151,11 @@ viewport.addEventListener('wheel', (e) => {
 
 // Panning
 viewport.addEventListener('mousedown', (e) => {
-  if (e.target === viewport || e.target.id === 'gridOverlay' || !e.target.classList.contains('cell')) {
-    isPanning = true;
-    startX = e.clientX - translateX;
-    startY = e.clientY - translateY;
-    viewport.style.cursor = 'grabbing';
-  }
+  isPanning = true;
+  dragDistance = 0;
+  startX = e.clientX - translateX;
+  startY = e.clientY - translateY;
+  viewport.style.cursor = 'grabbing';
 });
 
 window.addEventListener('mouseup', () => {
@@ -165,8 +165,13 @@ window.addEventListener('mouseup', () => {
 
 window.addEventListener('mousemove', (e) => {
   if (!isPanning) return;
-  translateX = e.clientX - startX;
-  translateY = e.clientY - startY;
+  const newX = e.clientX - startX;
+  const newY = e.clientY - startY;
+  const deltaX = newX - translateX;
+  const deltaY = newY - translateY;
+  dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
+  translateX = newX;
+  translateY = newY;
   updateTransform();
 });
 
@@ -373,6 +378,11 @@ function onCellClick(e) {
   // Prevent default to avoid double-firing on touch devices
   if (e.type === 'touchend') {
     e.preventDefault();
+  }
+  
+  // Ignore clicks that were actually drags
+  if (dragDistance > 5) {
+    return;
   }
   
   if (!user) {

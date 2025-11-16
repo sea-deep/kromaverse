@@ -7,6 +7,7 @@ const MongoStore = require('connect-mongo');
 const bcrypt = require('bcryptjs');
 const helmet = require('helmet');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { Server } = require('socket.io');
 const path = require('path');
 
@@ -34,6 +35,7 @@ mongoose.connect(MONGO)
 app.use(helmet({
   contentSecurityPolicy: false, // Allow inline scripts for simplicity
 }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
 // Trust the first proxy (needed for secure cookies on Railway/Heroku)
