@@ -26,9 +26,10 @@ const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'change_this_secret_key';
 const COOLDOWN_MS = 3000; // 3 seconds cooldown
 
-// Connect to MongoDB
-mongoose.connect(MONGO)
-  .then(() => console.log('✓ Connected to MongoDB'))
+// Connect to MongoDB (force DB name to avoid default 'test')
+const DB_NAME = process.env.MONGO_DB || 'kromaverse';
+mongoose.connect(MONGO, { dbName: DB_NAME })
+  .then(() => console.log(`✓ Connected to MongoDB (db: ${DB_NAME})`))
   .catch(err => console.error('✗ MongoDB connection error:', err));
 
 // Middleware
@@ -48,6 +49,7 @@ const sessionMiddleware = session({
   saveUninitialized: false,
   store: MongoStore.create({ 
     mongoUrl: MONGO,
+    dbName: DB_NAME,
     touchAfter: 24 * 3600 // Lazy session update
   }),
   cookie: { 

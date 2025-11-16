@@ -56,6 +56,8 @@ const zoomOutBtn = document.getElementById('zoomOut');
 const resetViewBtn = document.getElementById('resetView');
 const zoomLevelEl = document.getElementById('zoomLevel');
 const notificationEl = document.getElementById('notification');
+const mobileAuth = document.getElementById('mobileAuth');
+const mobileTimer = document.getElementById('mobileTimer');
 
 // ===== NOTIFICATION SYSTEM =====
 function showNotification(message, type = 'info') {
@@ -254,12 +256,8 @@ btnReg.addEventListener('click', async () => {
     const data = await response.json();
     
     if (data.ok) {
-      user = data.user;
-      renderUser();
-      fetchAndPaint();
-      showNotification(`Welcome, ${username}! 🎨`, 'success');
-      usernameInp.value = '';
-      passwordInp.value = '';
+      // Refresh so session is active everywhere immediately
+      window.location.reload();
     } else {
       showNotification(data.error === 'exists' ? 'Username already taken' : 'Registration failed', 'error');
     }
@@ -287,12 +285,8 @@ btnLogin.addEventListener('click', async () => {
     const data = await response.json();
     
     if (data.ok) {
-      user = data.user;
-      renderUser();
-      fetchAndPaint();
-      showNotification(`Welcome back, ${username}! 🎨`, 'success');
-      usernameInp.value = '';
-      passwordInp.value = '';
+      // Refresh so session is active everywhere immediately
+      window.location.reload();
     } else {
       showNotification('Invalid username or password', 'error');
     }
@@ -304,9 +298,8 @@ btnLogin.addEventListener('click', async () => {
 btnLogout.addEventListener('click', async () => {
   try {
     await fetch('/api/logout', { method: 'POST' });
-    user = null;
-    renderUser();
-    showNotification('Logged out successfully', 'info');
+    // Refresh to clear state fully
+    window.location.reload();
   } catch (error) {
     showNotification('Logout failed', 'error');
   }
@@ -325,11 +318,23 @@ function renderUser() {
     userInfo.style.display = 'block';
     btnLogout.style.display = 'block';
     authForms.style.display = 'none';
+    // Update compact mobile auth indicator
+    if (mobileAuth) mobileAuth.innerHTML = `<span class="icon">👤</span><span class="text">${user.username}</span>`;
   } else {
     userInfo.style.display = 'none';
     btnLogout.style.display = 'none';
     authForms.style.display = 'flex';
+    if (mobileAuth) mobileAuth.innerHTML = `<span class="icon">🔐</span><span class="text">Login</span>`;
   }
+}
+
+// Toggle auth overlay when tapping compact auth
+if (mobileAuth) {
+  mobileAuth.addEventListener('click', () => {
+    const authSection = document.querySelector('.auth-section');
+    if (!authSection) return;
+    authSection.classList.toggle('show');
+  });
 }
 
 // ===== LOAD USER SESSION =====
@@ -467,9 +472,11 @@ function updateCooldownDisplay() {
   if (cooldownLeft > 0) {
     cooldownEl.textContent = `Wait ${cooldownLeft}s`;
     cooldownEl.className = 'status-text cooldown';
+    if (mobileTimer) mobileTimer.textContent = `⏱️ ${cooldownLeft}s`;
   } else {
     cooldownEl.textContent = 'Ready to place! ✓';
     cooldownEl.className = 'status-text ready';
+    if (mobileTimer) mobileTimer.textContent = '✓ Ready';
   }
 }
 

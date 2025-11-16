@@ -96,6 +96,20 @@ body {
   gap: 0.5rem;
 }
 
+/* Compact mobile auth indicator (hidden by default) */
+.mobile-auth {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-light);
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .menu-link {
   display: flex;
   align-items: center;
@@ -609,6 +623,7 @@ body {
 }
 
 @media (max-width: 768px) {
+  :root { --mobile-palette-height: 150px; }
   body {
     font-size: 14px;
   }
@@ -644,51 +659,76 @@ body {
     font-size: 1rem;
   }
   
+  /* Show compact auth in header on mobile */
+  .mobile-auth { display: flex; }
+  .mobile-auth .icon { font-size: 1.1rem; }
+  .mobile-auth .text { font-size: 0.9rem; }
+
   .main {
     flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+    gap: 0.5rem;
+    padding: 0.5rem;
   }
   
   .controls {
     width: 100%;
-    max-height: none;
-    padding: 1rem;
+    max-height: unset;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
   }
   
-  .control-section {
-    gap: 0.65rem;
-  }
+  /* Hide most sections on mobile by default */
+  .control-section { display: none; }
+  /* Auth section hidden by default on mobile; toggled via .show */
+  .auth-section { display: none; }
+  .auth-section.show { display: block; }
+  .palette-section { display: block; }
   
   .section-title {
     font-size: 0.85rem;
   }
   
+  /* Bottom docked palette */
+  .palette-section {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 250;
+    background: var(--card-bg);
+    border-top: 2px solid var(--border-light);
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.08);
+    padding: 0.5rem 0.75rem 0.75rem;
+  }
+  .palette-section .section-title { display: none; }
   .palette {
-    grid-template-columns: repeat(4, 1fr);
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
     gap: 0.5rem;
   }
   
   .color-swatch {
-    height: 48px;
+    height: 44px;
   }
   
   .selected-color-display {
-    padding: 0.65rem;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
   }
   
   .color-preview {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
   
   .tips-section {
     display: none;
   }
   
-  .canvas-area {
-    min-height: 400px;
-  }
+  .canvas-area { min-height: calc(100vh - var(--mobile-palette-height) - 64px); }
   
   .canvas-container {
     height: 100%;
@@ -709,16 +749,30 @@ body {
     height: 40px;
     font-size: 1.3rem;
   }
+
+  /* Floating cooldown timer badge */
+  .mobile-timer {
+    position: fixed;
+    right: 0.75rem;
+    bottom: calc(var(--mobile-palette-height) + 0.75rem);
+    z-index: 260;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-light);
+    border-radius: 999px;
+    padding: 0.4rem 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-md);
+  }
   
   .canvas-size {
     font-size: 0.8rem;
     padding: 0.35rem 0.65rem;
   }
   
-  .viewport {
-    touch-action: none;
-    cursor: default;
-  }
+  .viewport { touch-action: none; cursor: default; }
+  /* Add bottom safe space so bottom palette doesn't cover key content */
+  .canvas-container { padding-bottom: calc(var(--mobile-palette-height) + 8px); }
   
   .cell {
     cursor: pointer;
@@ -730,6 +784,25 @@ body {
     max-width: calc(100vw - 2rem);
     padding: 0.85rem 1.25rem;
   }
+
+  /* Top-right auth overlay */
+  .auth-section {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 300;
+    width: min(85vw, 280px);
+    background: var(--card-bg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 0.75rem;
+  }
+  .auth-section .section-title { display: none; }
+  .auth-forms { gap: 0.5rem; }
+  .button-group { grid-template-columns: 1fr 1fr; }
+  #btnLogout { margin-top: 0.25rem; }
+  .status-display { display: none; }
   
   /* Mobile-specific touch feedback */
   .color-swatch:active {
