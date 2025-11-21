@@ -1,6 +1,6 @@
-// server/models/Pixel.js
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
+
 const PixelSchema = new Schema({
   x: { type: Number, required: true },
   y: { type: Number, required: true },

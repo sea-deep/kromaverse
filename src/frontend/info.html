@@ -106,25 +106,45 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <span class="brand-icon">🎨</span>
+      <span class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Palette">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M7 10a2 2 0 1 1 0-4" />
+          <path d="M12 8a2 2 0 1 1 0-4" />
+          <path d="M17 10a2 2 0 1 1 0-4" />
+          <path d="M15 16c0 1.5-1.2 2-2.5 2H12a3 3 0 0 1 0-6h1.5a3.5 3.5 0 0 1 3.5 3.5" />
+        </svg>
+      </span>
       <span class="brand-text">KromaVerse</span>
     </div>
     <div id="mobileAuth" class="mobile-auth" style="display:none;"></div>
     <nav class="menu">
-      <a href="/" class="menu-link">
-        <span class="menu-icon">🏠</span>
+      <a href="/" class="menu-link" aria-label="Canvas">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12l9-9 9 9" />
+          <path d="M4 11v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9" />
+        </svg>
         <span>Canvas</span>
       </a>
-      <a href="/info" class="menu-link">
-        <span class="menu-icon">ℹ️</span>
+      <a href="/info" class="menu-link" aria-label="Info">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="10" x2="12" y2="16" />
+          <circle cx="12" cy="7" r="1" />
+        </svg>
         <span>Info</span>
       </a>
-      <a href="/docs" class="menu-link">
-        <span class="menu-icon">📚</span>
+      <a href="/docs" class="menu-link" aria-label="Docs">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 2h8l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+          <path d="M15 2v5h5" />
+        </svg>
         <span>Docs</span>
       </a>
-      <a href="https://github.com/sea-deep/kromaverse" target="_blank" rel="noopener noreferrer" class="menu-link">
-        <span class="menu-icon">🐙</span>
+      <a href="https://github.com/sea-deep/kromaverse" target="_blank" rel="noopener noreferrer" class="menu-link" aria-label="GitHub">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.58 2 12.14c0 4.47 2.87 8.26 6.84 9.62.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.36-3.37-1.36-.45-1.17-1.11-1.48-1.11-1.48-.91-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.12 2.94.86.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.13-4.56-5 0-1.11.39-2.02 1.03-2.73-.1-.26-.45-1.3.1-2.71 0 0 .84-.27 2.75 1.04a9.38 9.38 0 0 1 5 0c1.9-1.31 2.74-1.04 2.74-1.04.55 1.41.2 2.45.1 2.71.64.71 1.03 1.62 1.03 2.73 0 3.88-2.34 4.74-4.57 4.99.36.32.68.95.68 1.92 0 1.39-.01 2.51-.01 2.85 0 .26.18.58.69.48A10.02 10.02 0 0 0 22 12.14C22 6.58 17.52 2 12 2z" />
+        </svg>
         <span>GitHub</span>
       </a>
     </nav>
@@ -133,59 +153,79 @@
   <main class="info-page">
     <div class="info-content">
       <h1>🎨 KromaVerse</h1>
-      <p style="font-size:1.15rem;font-weight:500;color:var(--text-primary);">A shared pixel board. One pixel. One cooldown. Infinite chaos.</p>
+      <p style="font-size:1.15rem;font-weight:500;color:var(--text-primary);">A shared pixel board. One pixel. One turn. Infinite creativity.</p>
 
       <div class="highlight-box" style="display:flex;gap:0.75rem;align-items:flex-start;">
         <div>🧩</div>
-        <div><strong>Everyone edits the same 64×64 canvas.</strong><br/>Your pixel instantly appears for all. The board never resets (unless we wipe it). Make something. Defend it. Remix it.</div>
+        <div><strong>Everyone edits the same 128×128 canvas.</strong><br/>Your pixel instantly appears for all. The board never resets. Make something. Defend it. Remix it.</div>
       </div>
 
       <h2>🕹️ How It Works</h2>
       <ol style="list-style:decimal;margin-left:1.25rem;">
-        <li><strong>Pick a color</strong> from the palette (or the rainbow custom picker).</li>
-        <li><strong>Click / tap a cell</strong> to drop a pixel.</li>
-        <li><strong>Wait 3 seconds</strong> (cooldown says “Ready” when you can go again).</li>
-        <li><strong>Repeat endlessly</strong> — build art, text, flags, memes, alliances.</li>
+        <li><strong>Register/Login</strong> — Click the menu button (top right) to create an account or sign in.</li>
+        <li><strong>Pick a color</strong> from the 24-color palette or use the custom color picker (25th slot).</li>
+        <li><strong>Click/tap a cell</strong> to place your pixel instantly.</li>
+        <li><strong>Manage your turns</strong> — You start with 64 turns. Each pixel costs 1 turn.</li>
+        <li><strong>Turns refill automatically</strong> — When you hit 0 turns, refilling begins: +1 turn every 10 seconds (up to 64).</li>
       </ol>
 
-      <h2>🧭 Basic Controls</h2>
+      <h2>🎫 Turn System</h2>
       <ul>
-        <li><strong>Zoom:</strong> + / − buttons or scroll / pinch.</li>
-        <li><strong>Pan:</strong> Drag (mouse or one finger).</li>
-        <li><strong>Reset View:</strong> ⟲ button recenters.</li>
-        <li><strong>Selected Color:</strong> Preview box under palette.</li>
+        <li><strong>64 turns maximum</strong> — Your turn counter shows "X/64 turns" in the canvas toolbar.</li>
+        <li><strong>1 turn per pixel</strong> — Each placement consumes one turn.</li>
+        <li><strong>Auto-refill when empty</strong> — At 0 turns, a timer appears: "+1 turn in Xs". You'll gain 1 turn every 10 seconds.</li>
+        <li><strong>Refill stops at 64</strong> — Once you hit max, the timer disappears until you place more pixels.</li>
+        <li><strong>No refill while above 0</strong> — Refilling only activates when turns reach exactly 0.</li>
       </ul>
 
-      <h2>✅ Simple Rules</h2>
+      <h2>🎨 Color Palette</h2>
       <ul>
-        <li>No hate, harassment, or hateful symbols.</li>
-        <li>No super gross / explicit stuff.</li>
-        <li>Don’t spam scripts or automated floods.</li>
-        <li>Username must be unique. That’s basically it.</li>
+        <li><strong>24 preset colors</strong> — A diverse spectrum covering all major hues and neutrals.</li>
+        <li><strong>Custom color picker</strong> — The last slot opens a full color selector for any shade you need.</li>
+        <li><strong>Personal color history</strong> — Your last 6 custom colors are saved and replace the tail of your palette automatically.</li>
       </ul>
 
-      <h2>💡 Quick Tips</h2>
+      <h2>🧭 Canvas Controls</h2>
       <ul>
-        <li>Team up: defend edges, patch griefs fast.</li>
-        <li>Outline first (black / dark), fill second for clean shapes.</li>
-        <li>Use the custom picker for shades and gradients.</li>
-        <li>Zoom in for precision, zoom out to spot battles.</li>
+        <li><strong>Zoom:</strong> Use +/− buttons or scroll/pinch to zoom in and out.</li>
+        <li><strong>Pan:</strong> Click and drag (mouse) or swipe (touch) to move around the canvas.</li>
+        <li><strong>Reset View:</strong> ⟲ button recenters and resets zoom to 100%.</li>
+        <li><strong>Pan Limits:</strong> You can scroll 75% beyond canvas edges for comfortable viewing.</li>
+      </ul>
+
+      <h2>✅ Rules</h2>
+      <ul>
+        <li>No hate speech, harassment, or hateful symbols.</li>
+        <li>No explicit or offensive content.</li>
+        <li>No automated scripts or bots.</li>
+        <li>Usernames must be unique.</li>
+        <li>Admin users have unlimited turns for moderation.</li>
+      </ul>
+
+      <h2>💡 Pro Tips</h2>
+      <ul>
+        <li><strong>Manage your turns wisely</strong> — With only 64 turns, plan your art before placing.</li>
+        <li><strong>Collaborate</strong> — Team up with others to build larger designs.</li>
+        <li><strong>Outline first</strong> — Use dark colors for borders, then fill with lighter shades.</li>
+        <li><strong>Watch the timer</strong> — When at 0 turns, you'll see exactly when your next turn arrives.</li>
+        <li><strong>Save custom colors</strong> — Your recent picks are stored in your account for quick reuse.</li>
       </ul>
 
       <div class="highlight-box" style="display:flex;gap:0.75rem;align-items:flex-start;">
         <div>🔥</div>
-        <div><strong>Territory wars happen.</strong> If someone overwrites you: rebuild, negotiate, merge, or start something new. The canvas is alive — embrace the chaos.</div>
+        <div><strong>Territory wars happen.</strong> If someone overwrites you: rebuild, negotiate, merge, or start something new. The 128×128 canvas is your shared playground — embrace the chaos.</div>
       </div>
 
-      <h2>📱 Mobile</h2>
+      <h2>📱 Mobile Experience</h2>
       <ul>
-        <li>Tap <strong>Hide Palette</strong> to see more board.</li>
-        <li>Pinch to zoom, drag to pan.</li>
-        <li>Cooldown timer lives in the top toolbar.</li>
+        <li><strong>Responsive design</strong> — Palette, controls, and canvas adapt to your screen size.</li>
+        <li><strong>Touch gestures</strong> — Tap to place, pinch to zoom, drag to pan.</li>
+        <li><strong>Collapse palette</strong> — Hide the color palette for maximum canvas space.</li>
+        <li><strong>Toolbar stats</strong> — Turns and pixel count stay visible at the top.</li>
       </ul>
 
-      <h2>🚀 Start Placing</h2>
-      <p style="margin-bottom:1.25rem;">That’s all you need. One pixel at a time — go make your mark.</p>
+      <h2>🚀 Start Creating</h2>
+      <p style="margin-bottom:1.25rem;">That's everything you need. 128×128 pixels. 64 turns. One shared canvas. Go make your mark.</p>
       <a href="/" class="cta-button">Jump to Canvas ➜</a>
     </div>
   </main>

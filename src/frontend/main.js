@@ -1,28 +1,30 @@
 // KromaVerse - Client JavaScript
 const socket = io();
-const GRID_SIZE = 64;
+const GRID_SIZE = 128; // Expanded grid size
 const CELL_SIZE = 10;
 
-// 11 popular solid colors + custom picker
-const PALETTE_COLORS = [
-  '#FF0000', // Red
-  '#FFA500', // Orange
-  '#FFFF00', // Yellow
-  '#00FF00', // Green
-  '#00FFFF', // Cyan
-  '#0000FF', // Blue
-  '#800080', // Purple
-  '#FF69B4', // Pink
-  '#FFFFFF', // White
-  '#808080', // Gray
-  '#000000'  // Black
-];
+// Base palette: 24 preset colors (broad spectrum & neutrals)
+const BASE_PALETTE = [
+  '#FF0000','#FF7F00','#FFB300','#FFFF00',
+  '#A8FF00','#00FF00','#00FF7F','#00FFC8',
+  '#00FFFF','#00BFFF','#008CFF','#0000FF',
+  '#4B0082','#8B00FF','#FF00FF','#FF69B4',
+  '#FF1493','#8B4513','#D2B48C','#FFFFFF',
+  '#D3D3D3','#808080','#000000','#4ECDC4'
+]; // Last color (#4ECDC4 accent) can be replaced by custom colors
+
+let PALETTE_COLORS = [...BASE_PALETTE];
 
 let selectedColor = PALETTE_COLORS[0];
+let customColors = []; // From user account
 let user = null;
-let cooldownLeft = 0;
-let cooldownTimer = null;
+let turnsRemaining = 64;
+let lastTurnRefill = null;
+let maxTurns = 64;
+let refillMs = 10000;
+let refillTimerInterval = null;
 let pixelCount = 0;
+let pickerDebounceTimer = null; // Debounce color picker saves
 
 // Pan & Zoom state
 let scale = 1;
@@ -34,29 +36,33 @@ let startY = 0;
 let dragDistance = 0;
 
 // DOM Elements
-const gridEl = document.getElementById('grid');
+const gridCanvas = document.getElementById('gridCanvas');
+const gridCtx = gridCanvas ? gridCanvas.getContext('2d', { alpha: false }) : null;
 const paletteEl = document.getElementById('palette');
 const colorPreview = document.getElementById('colorPreview');
 const selectedColorLabel = document.getElementById('selectedColorLabel');
-const cooldownEl = document.getElementById('cooldown');
-const pixelCountEl = document.getElementById('pixelCount');
+const turnsCountEl = document.getElementById('turnsCount');
+const pixelCountEl = document.getElementById('pixelsCount'); // Fixed: was 'pixelCount', should be 'pixelsCount'
 const viewport = document.getElementById('viewport');
 
-const usernameInp = document.getElementById('username');
-const passwordInp = document.getElementById('password');
-const btnLogin = document.getElementById('btnLogin');
-const btnReg = document.getElementById('btnReg');
-const btnLogout = document.getElementById('btnLogout');
-const userInfo = document.getElementById('userInfo');
-const authForms = document.getElementById('authForms');
+const usernameInp = document.getElementById('usernameModal');
+const passwordInp = document.getElementById('passwordModal');
+const btnLogin = document.getElementById('btnLoginModal');
+const btnReg = document.getElementById('btnRegModal');
+const btnLogout = document.getElementById('btnLogoutModal');
+const userInfo = document.getElementById('authModalUserInfo');
+const authForms = document.getElementById('authModalForms');
 
 const zoomInBtn = document.getElementById('zoomIn');
 const zoomOutBtn = document.getElementById('zoomOut');
 const resetViewBtn = document.getElementById('resetView');
 const zoomLevelEl = document.getElementById('zoomLevel');
 const notificationEl = document.getElementById('notification');
-const mobileAuth = document.getElementById('mobileAuth');
-const cooldownCanvasEl = document.getElementById('cooldownCanvas');
+const authMenuBtn = document.getElementById('authMenuBtn');
+const authMenuLabel = document.getElementById('authMenuLabel');
+const authModal = document.getElementById('authModal');
+const authModalClose = document.getElementById('authModalClose');
+const authModalTitle = document.getElementById('authModalTitle');
 const paletteToggle = document.getElementById('paletteToggle');
 
 // ===== NOTIFICATION SYSTEM =====
@@ -70,72 +76,134 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
-// ===== BUILD COLOR PALETTE =====
-PALETTE_COLORS.forEach((color, index) => {
-  const swatch = document.createElement('div');
-  swatch.className = 'color-swatch';
-  swatch.style.background = color;
-  swatch.dataset.color = color;
-  
-  if (index === 0) {
-    swatch.classList.add('selected');
+// ===== BUILD / REBUILD COLOR PALETTE =====
+function rebuildPalette() {
+  paletteEl.innerHTML = '';
+  // Clone base palette
+  PALETTE_COLORS = [...BASE_PALETTE];
+  // Replace tail colors with custom colors (up to MAX_CUSTOM_COLORS from server)
+  if (customColors.length) {
+    const replaceCount = Math.min(customColors.length, 6);
+    for (let i = 0; i < replaceCount; i++) {
+      // Replace from end backwards (keep early spectrum stable)
+      const idx = PALETTE_COLORS.length - 1 - i;
+      PALETTE_COLORS[idx] = customColors[i];
+    }
   }
-  
-  swatch.addEventListener('click', () => {
-    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
-    swatch.classList.add('selected');
-    selectedColor = color;
-    selectedColorLabel.textContent = color;
-    colorPreview.style.background = color;
+  PALETTE_COLORS.forEach((color, index) => {
+    const swatch = document.createElement('div');
+    swatch.className = 'color-swatch';
+    swatch.style.background = color;
+    swatch.dataset.color = color;
+    if (index === 0 && !selectedColor) {
+      swatch.classList.add('selected');
+      selectedColor = color;
+    }
+    swatch.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      swatch.classList.add('selected');
+      selectedColor = color;
+      selectedColorLabel.textContent = color;
+      colorPreview.style.background = color;
+    });
+    paletteEl.appendChild(swatch);
   });
-  
-  paletteEl.appendChild(swatch);
-});
+  // Add color picker swatch
+  const pickerSwatch = document.createElement('div');
+  pickerSwatch.className = 'color-swatch color-picker-swatch';
+  pickerSwatch.innerHTML = '<input type="color" id="colorPicker" class="color-picker-input" value="#FF1493" />';
+  paletteEl.appendChild(pickerSwatch);
+  const colorPicker = document.getElementById('colorPicker');
+  colorPicker.addEventListener('input', (e) => {
+    const picked = e.target.value.toUpperCase();
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+    pickerSwatch.classList.add('selected');
+    selectedColor = picked;
+    selectedColorLabel.textContent = picked;
+    colorPreview.style.background = picked;
+    // Debounce save: only persist after 500ms of no changes
+    if (pickerDebounceTimer) clearTimeout(pickerDebounceTimer);
+    pickerDebounceTimer = setTimeout(() => {
+      if (user && !customColors.includes(picked)) {
+        saveCustomColor(picked);
+      }
+    }, 500);
+  });
+  colorPicker.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+    pickerSwatch.classList.add('selected');
+  });
+  // Initialize display values
+  colorPreview.style.background = selectedColor;
+  selectedColorLabel.textContent = selectedColor;
+}
 
-// Add custom color picker as 12th option
-const pickerSwatch = document.createElement('div');
-pickerSwatch.className = 'color-swatch color-picker-swatch';
-pickerSwatch.innerHTML = '<input type="color" id="colorPicker" class="color-picker-input" value="#FF1493" />';
-paletteEl.appendChild(pickerSwatch);
-
-const colorPicker = document.getElementById('colorPicker');
-colorPicker.addEventListener('input', (e) => {
-  const customColor = e.target.value.toUpperCase();
-  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
-  pickerSwatch.classList.add('selected');
-  selectedColor = customColor;
-  selectedColorLabel.textContent = customColor;
-  colorPreview.style.background = customColor;
-});
-colorPicker.addEventListener('click', (e) => {
-  e.stopPropagation();
-  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
-  pickerSwatch.classList.add('selected');
-});
-
-// Initialize color display
-colorPreview.style.background = selectedColor;
-selectedColorLabel.textContent = selectedColor;
-
-// ===== BUILD GRID (64×64) =====
-for (let y = 0; y < GRID_SIZE; y++) {
-  for (let x = 0; x < GRID_SIZE; x++) {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    cell.dataset.x = x;
-    cell.dataset.y = y;
-    
-    // Add both click and touch events
-    cell.addEventListener('click', onCellClick);
-    cell.addEventListener('touchend', onCellClick);
-    
-    gridEl.appendChild(cell);
+async function saveCustomColor(color) {
+  try {
+    const resp = await fetch('/api/color', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ color })
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      customColors = data.customColors;
+      rebuildPalette();
+    }
+  } catch (err) {
+    console.error('Failed to save custom color:', err);
   }
+}
+
+// ===== INITIAL PALETTE BUILD =====
+rebuildPalette();
+
+// ===== BUILD CANVAS GRID (128×128) =====
+if (gridCanvas && gridCtx) {
+  gridCanvas.width = GRID_SIZE * CELL_SIZE;
+  gridCanvas.height = GRID_SIZE * CELL_SIZE;
+  // Disable image smoothing for crisp pixels
+  gridCtx.imageSmoothingEnabled = false;
+  // Fill with white background
+  gridCtx.fillStyle = '#FFFFFF';
+  gridCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
+  // Draw grid lines
+  gridCtx.strokeStyle = 'rgba(203, 213, 224, 0.4)';
+  gridCtx.lineWidth = 0.5;
+  for (let i = 0; i <= GRID_SIZE; i++) {
+    // Vertical lines
+    gridCtx.beginPath();
+    gridCtx.moveTo(i * CELL_SIZE, 0);
+    gridCtx.lineTo(i * CELL_SIZE, gridCanvas.height);
+    gridCtx.stroke();
+    // Horizontal lines
+    gridCtx.beginPath();
+    gridCtx.moveTo(0, i * CELL_SIZE);
+    gridCtx.lineTo(gridCanvas.width, i * CELL_SIZE);
+    gridCtx.stroke();
+  }
+}
+
+// ===== CANVAS CLICK HANDLER =====
+if (gridCanvas) {
+  gridCanvas.addEventListener('click', onCanvasClick);
+  gridCanvas.addEventListener('touchend', onCanvasClick);
 }
 
 // ===== ZOOM & PAN CONTROLS =====
 function updateTransform() {
-  gridEl.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  if (gridCanvas) {
+    // Calculate pan limits based on scale (allow some overflow for comfort)
+    const canvasSize = GRID_SIZE * CELL_SIZE * scale;
+    const maxPan = canvasSize * 0.75; // Allow panning up to 75% beyond edges
+    
+    // Clamp translate values
+    translateX = Math.max(-maxPan, Math.min(maxPan, translateX));
+    translateY = Math.max(-maxPan, Math.min(maxPan, translateY));
+    
+    gridCanvas.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
   zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
 }
 
@@ -335,26 +403,48 @@ passwordInp.addEventListener('keypress', (e) => {
 
 function renderUser() {
   if (user) {
+    authModalTitle.textContent = 'Account';
     userInfo.textContent = `👤 ${user.username}`;
     userInfo.style.display = 'block';
     btnLogout.style.display = 'block';
     authForms.style.display = 'none';
-    // Update compact mobile auth indicator
-    if (mobileAuth) mobileAuth.innerHTML = `<span class="icon">👤</span><span class="text">${user.username}</span>`;
+    authMenuLabel.textContent = user.username;
+    // Show stats
+    document.getElementById('turnsDisplay').style.display = 'block';
+    document.getElementById('pixelsDisplay').style.display = 'block';
+    if (typeof user.pixelsPlaced === 'number') {
+      document.getElementById('pixelsCount').textContent = user.pixelsPlaced;
+    }
   } else {
+    authModalTitle.textContent = 'Login / Register';
     userInfo.style.display = 'none';
     btnLogout.style.display = 'none';
     authForms.style.display = 'flex';
-    if (mobileAuth) mobileAuth.innerHTML = `<span class="icon">🔐</span><span class="text">Login</span>`;
+    authMenuLabel.textContent = 'Login';
+    // Hide stats when not logged in
+    document.getElementById('turnsDisplay').style.display = 'none';
+    document.getElementById('refillTimer').style.display = 'none';
+    document.getElementById('pixelsDisplay').style.display = 'none';
   }
 }
 
-// Toggle auth overlay when tapping compact auth
-if (mobileAuth) {
-  mobileAuth.addEventListener('click', () => {
-    const authSection = document.querySelector('.auth-section');
-    if (!authSection) return;
-    authSection.classList.toggle('show');
+// Auth modal toggle
+if (authMenuBtn) {
+  authMenuBtn.addEventListener('click', () => {
+    authModal.classList.add('show');
+  });
+}
+if (authModalClose) {
+  authModalClose.addEventListener('click', () => {
+    authModal.classList.remove('show');
+  });
+}
+// Close modal on backdrop click
+if (authModal) {
+  authModal.addEventListener('click', (e) => {
+    if (e.target === authModal) {
+      authModal.classList.remove('show');
+    }
   });
 }
 
@@ -380,7 +470,22 @@ async function loadMe() {
     const response = await fetch('/api/me');
     const data = await response.json();
     user = data.user;
+    if (user && Array.isArray(user.customColors)) {
+      customColors = user.customColors;
+    }
+    if (user && typeof user.turnsRemaining === 'number') {
+      turnsRemaining = user.turnsRemaining;
+      lastTurnRefill = user.lastTurnRefill;
+      maxTurns = user.maxTurns || 64;
+      refillMs = user.refillMs || 10000;
+    }
     renderUser();
+    rebuildPalette();
+    
+    if (user) {
+      updateTurnsDisplay();
+      startRefillTimer();
+    }
   } catch (error) {
     console.error('Failed to load user session:', error);
   }
@@ -406,27 +511,86 @@ async function fetchAndPaint() {
 }
 
 function paintCell(x, y, color) {
-  const index = y * GRID_SIZE + x;
-  const cell = gridEl.children[index];
-  if (cell) {
-    cell.style.background = color;
-    cell.style.borderColor = 'transparent';
-  }
+  if (!gridCtx) return;
+  gridCtx.fillStyle = color;
+  gridCtx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+  // Redraw grid line borders for this cell
+  gridCtx.strokeStyle = 'rgba(203, 213, 224, 0.4)';
+  gridCtx.lineWidth = 0.5;
+  gridCtx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
 }
 
 function updatePixelCount() {
-  pixelCountEl.textContent = `${pixelCount.toLocaleString()} pixels placed`;
+  pixelCountEl.textContent = `${pixelCount.toLocaleString()}`;
 }
 
-// ===== HANDLE CELL CLICKS =====
-function onCellClick(e) {
+function updateTurnsDisplay() {
+  const turnsCountEl = document.getElementById('turnsCount');
+  if (turnsCountEl) {
+    turnsCountEl.textContent = `${turnsRemaining}/${maxTurns}`;
+  }
+}
+
+function startRefillTimer() {
+  // Clear existing timer
+  if (refillTimerInterval) {
+    clearInterval(refillTimerInterval);
+    refillTimerInterval = null;
+  }
+  
+  const refillTimerEl = document.getElementById('refillTimer');
+  if (!refillTimerEl) return;
+  
+  // Show timer if refill is active (turns < MAX and timer started)
+  if (lastTurnRefill && turnsRemaining < maxTurns) {
+    refillTimerEl.style.display = 'block';
+    
+    refillTimerInterval = setInterval(async () => {
+      const now = Date.now();
+      const msSinceRefill = now - lastTurnRefill;
+      const secondsUntilNext = Math.ceil((refillMs - (msSinceRefill % refillMs)) / 1000);
+      
+      document.getElementById('refillSeconds').textContent = secondsUntilNext;
+      
+      // Check if we should have refilled by now
+      const turnsToRefill = Math.floor(msSinceRefill / refillMs);
+      if (turnsToRefill > 0) {
+        // Fetch updated turn count from server
+        try {
+          const response = await fetch('/api/me');
+          const data = await response.json();
+          if (data.user && data.user.turnsRemaining !== undefined) {
+            turnsRemaining = data.user.turnsRemaining;
+            lastTurnRefill = data.user.lastTurnRefill;
+            updateTurnsDisplay();
+            
+            // Stop timer only if reached max turns or timer cleared
+            if (turnsRemaining >= maxTurns || !lastTurnRefill) {
+              clearInterval(refillTimerInterval);
+              refillTimerInterval = null;
+              refillTimerEl.style.display = 'none';
+            }
+          }
+        } catch (error) {
+          console.error('Failed to check turn refill:', error);
+        }
+      }
+    }, 1000); // Check every second
+  } else {
+    // Hide timer if maxed out or no refill active
+    refillTimerEl.style.display = 'none';
+  }
+}
+
+// ===== HANDLE CANVAS CLICKS =====
+function onCanvasClick(e) {
   // Prevent default to avoid double-firing on touch devices
   if (e.type === 'touchend') {
     e.preventDefault();
   }
   
-  // Ignore clicks that were actually drags (mouse or touch)
-  if (dragDistance > 5 || touchDragDistance > 20) { // touch accumulates faster, use larger threshold
+  // Ignore clicks that were actually drags
+  if (dragDistance > 5 || touchDragDistance > 20) {
     return;
   }
   
@@ -435,20 +599,33 @@ function onCellClick(e) {
     return;
   }
   
-  if (cooldownLeft > 0) {
-    showNotification(`Wait ${cooldownLeft}s before placing another pixel ⏱️`, 'warning');
+  // Check turns (admin has unlimited)
+  if (user.username !== 'admin' && turnsRemaining <= 0) {
+    showNotification('No turns remaining! Wait for refill ⏱️', 'warning');
     return;
   }
   
-  const x = parseInt(this.dataset.x);
-  const y = parseInt(this.dataset.y);
+  // Get canvas-relative coordinates
+  const rect = gridCanvas.getBoundingClientRect();
+  const clientX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
+  const clientY = e.type === 'touchend' ? e.changedTouches[0].clientY : e.clientY;
+  const canvasX = (clientX - rect.left) / (rect.width / GRID_SIZE);
+  const canvasY = (clientY - rect.top) / (rect.height / GRID_SIZE);
   
-  // Optimistic UI update
-  this.classList.add('placing');
-  setTimeout(() => this.classList.remove('placing'), 300);
+  const x = Math.floor(canvasX);
+  const y = Math.floor(canvasY);
   
-  // Start 3-second cooldown immediately
-  startCooldown(3000);
+  // Validate bounds
+  if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return;
+  
+  // Optimistic UI update (instant feedback)
+  paintCell(x, y, selectedColor);
+  
+  // Optimistically decrement turns for non-admin
+  if (user.username !== 'admin') {
+    turnsRemaining--;
+    updateTurnsDisplay();
+  }
   
   // Emit socket event
   socket.emit('place_pixel', { x, y, color: selectedColor });
@@ -459,11 +636,34 @@ socket.on('pixel_update', ({ x, y, color, user: username }) => {
   paintCell(x, y, color);
   pixelCount++;
   updatePixelCount();
+  // If this is our pixel, update our count
+  if (username === user?.username && typeof user.pixelsPlaced === 'number') {
+    user.pixelsPlaced++;
+    document.getElementById('pixelsCount').textContent = user.pixelsPlaced;
+  }
+});
+
+socket.on('turns_update', (data) => {
+  if (typeof data === 'object') {
+    turnsRemaining = data.turnsRemaining;
+    lastTurnRefill = data.lastTurnRefill;
+    maxTurns = data.maxTurns || 64;
+    refillMs = data.refillMs || 10000;
+  } else {
+    // Fallback for old format
+    turnsRemaining = data;
+  }
+  updateTurnsDisplay();
+  startRefillTimer();
 });
 
 socket.on('err', (message) => {
   if (message === 'not-auth') {
     showNotification('Please login to place pixels', 'error');
+  } else if (message === 'no-turns') {
+    showNotification('No turns remaining! Refills 1 per 10s ⏱️', 'warning');
+    turnsRemaining = 0;
+    updateTurnsDisplay();
   } else {
     showNotification('An error occurred', 'error');
   }
@@ -481,55 +681,11 @@ socket.on('connect_error', () => {
   showNotification('Connection error', 'error');
 });
 
-// ===== COOLDOWN SYSTEM =====
-function startCooldown(ms) {
-  // Clear any existing timer
-  if (cooldownTimer) {
-    clearInterval(cooldownTimer);
-    cooldownTimer = null;
-  }
-  
-  // Set initial cooldown based on milliseconds from server
-  cooldownLeft = Math.ceil(ms / 1000);
-  updateCooldownDisplay();
-  
-  // Start countdown
-  cooldownTimer = setInterval(() => {
-    cooldownLeft--;
-    updateCooldownDisplay();
-    
-    if (cooldownLeft <= 0) {
-      clearInterval(cooldownTimer);
-      cooldownTimer = null;
-      cooldownLeft = 0;
-      updateCooldownDisplay();
-    }
-  }, 1000);
-}
-
-function updateCooldownDisplay() {
-  if (cooldownLeft > 0) {
-    cooldownEl.textContent = `Wait ${cooldownLeft}s`;
-    cooldownEl.className = 'status-text cooldown';
-    if (cooldownCanvasEl) {
-      cooldownCanvasEl.textContent = `⏱️ ${cooldownLeft}s`;
-      cooldownCanvasEl.className = 'canvas-cooldown cooldown';
-    }
-  } else {
-    cooldownEl.textContent = 'Ready to place! ✓';
-    cooldownEl.className = 'status-text ready';
-    if (cooldownCanvasEl) {
-      cooldownCanvasEl.textContent = '✓ Ready';
-      cooldownCanvasEl.className = 'canvas-cooldown ready';
-    }
-  }
-}
-
 // ===== INITIALIZE APP =====
 async function init() {
-  await loadMe();
+  await loadMe(); // rebuildPalette called inside
   await fetchAndPaint();
-  updateCooldownDisplay();
+  updateTurnsDisplay();
   
   // Welcome message
   if (user) {

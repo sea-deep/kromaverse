@@ -20,26 +20,29 @@ const io = new Server(server, {
   cors: { origin: true, credentials: true }
 });
 
-// Environment variables
+// Environment configuration
 const MONGO = process.env.MONGO || 'mongodb://localhost:27017/kromaverse';
 const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'change_this_secret_key';
-const COOLDOWN_MS = 3000; // 3 seconds cooldown
-
-// Connect to MongoDB (force DB name to avoid default 'test')
 const DB_NAME = process.env.MONGO_DB || 'kromaverse';
+
+// Game configuration
+const MAX_GRID = 128;
+const MAX_CUSTOM_COLORS = 6;
+const MAX_TURNS = 64;
+const TURN_REFILL_MS = 10000;
+const ADMIN_USERNAME = 'admin';
 mongoose.connect(MONGO, { dbName: DB_NAME })
   .then(() => console.log(`✓ Connected to MongoDB (db: ${DB_NAME})`))
   .catch(err => console.error('✗ MongoDB connection error:', err));
 
 // Middleware
 app.use(helmet({
-  contentSecurityPolicy: false, // Allow inline scripts for simplicity
+  contentSecurityPolicy: false,
 }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
-// Trust the first proxy (needed for secure cookies on Railway/Heroku)
 app.set('trust proxy', 1);
 
 // Session configuration
@@ -50,10 +53,10 @@ const sessionMiddleware = session({
   store: MongoStore.create({ 
     mongoUrl: MONGO,
     dbName: DB_NAME,
-    touchAfter: 24 * 3600 // Lazy session update
+    touchAfter: 24 * 3600
   }),
   cookie: { 
-    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    maxAge: 1000 * 60 * 60 * 24,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax'
@@ -61,7 +64,7 @@ const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 
-// Serve static files from new frontend path
+// Serve static files
 app.use(express.static(path.join(__dirname, 'frontend')));
 
 // Root route
@@ -84,7 +87,7 @@ io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });
 
-// ==================== AUTH APIs ====================
+// Authentication endpoints
 app.post('/api/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -121,7 +124,8 @@ app.post('/api/register', async (req, res) => {
         ok: true, 
         user: { 
           id: user._id, 
-          username: user.username 
+          username: user.username,
+          customColors: user.customColors || []
         } 
       });
     });
@@ -167,7 +171,8 @@ app.post('/api/login', async (req, res) => {
         ok: true, 
         user: { 
           id: user._id, 
-          username: user.username 
+          username: user.username,
+          customColors: user.customColors || []
         } 
       });
     });
@@ -194,13 +199,48 @@ app.get('/api/me', async (req, res) => {
       return res.json({ user: null });
     }
     
-    const user = await User.findById(req.session.userId).select('_id username lastPlacedAt');
+    const user = await User.findById(req.session.userId).select('_id username pixelsPlaced lastPlacedAt customColors turnsRemaining lastTurnRefill');
     
     if (!user) {
       return res.json({ user: null });
     }
     
-    res.json({ user });
+    // Refill turns continuously if refill timer is active
+    if (user.lastTurnRefill && user.turnsRemaining < MAX_TURNS) {
+      const now = Date.now();
+      const msSinceRefill = now - user.lastTurnRefill.getTime();
+      const turnsToRefill = Math.floor(msSinceRefill / TURN_REFILL_MS);
+      
+      if (turnsToRefill > 0) {
+        // Calculate new turn count (cap at MAX_TURNS)
+        const newTurns = Math.min(MAX_TURNS, user.turnsRemaining + turnsToRefill);
+        user.turnsRemaining = newTurns;
+        
+        // Update refill timestamp by the number of turns actually refilled
+        const actualRefilled = newTurns - user.turnsRemaining + turnsToRefill;
+        user.lastTurnRefill = new Date(user.lastTurnRefill.getTime() + (actualRefilled * TURN_REFILL_MS));
+        
+        // If maxed out, clear refill timer
+        if (user.turnsRemaining >= MAX_TURNS) {
+          user.lastTurnRefill = null;
+        }
+        
+        await user.save();
+      }
+    }
+    
+    const userData = {
+      _id: user._id,
+      username: user.username,
+      pixelsPlaced: user.pixelsPlaced,
+      turnsRemaining: user.turnsRemaining,
+      lastTurnRefill: user.lastTurnRefill ? user.lastTurnRefill.getTime() : null,
+      maxTurns: MAX_TURNS,
+      refillMs: TURN_REFILL_MS,
+      customColors: user.customColors || []
+    };
+    
+    res.json({ user: userData });
     
   } catch (error) {
     console.error('Me error:', error);
@@ -208,7 +248,7 @@ app.get('/api/me', async (req, res) => {
   }
 });
 
-// ==================== PIXELS API ====================
+// Pixel and color endpoints
 app.get('/api/pixels', async (req, res) => {
   try {
     const pixels = await Pixel.find({}, 'x y color updatedAt')
@@ -223,15 +263,41 @@ app.get('/api/pixels', async (req, res) => {
   }
 });
 
-// ==================== SOCKET.IO ====================
-io.on('connection', (socket) => {
-  const logUserId = () => {
-    const currentId = socket.request.session?.userId?.toString() || null;
-    console.log(`User connected: ${currentId || 'anonymous'}`);
-  };
-  logUserId();
+// Save a newly picked custom color
+app.post('/api/color', async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'not-auth' });
+    }
+    const { color } = req.body;
+    if (!color || typeof color !== 'string' || !/^#[0-9A-Fa-f]{6}$/.test(color)) {
+      return res.status(400).json({ error: 'invalid-color' });
+    }
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.status(404).json({ error: 'user-not-found' });
+    // Normalize color to uppercase
+    const upper = color.toUpperCase();
+    // If already present move it to front (most recent)
+    user.customColors = user.customColors.filter(c => c !== upper);
+    user.customColors.unshift(upper);
+    // Trim to max
+    if (user.customColors.length > MAX_CUSTOM_COLORS) {
+      user.customColors = user.customColors.slice(0, MAX_CUSTOM_COLORS);
+    }
+    await user.save();
+    res.json({ ok: true, customColors: user.customColors });
+  } catch (err) {
+    console.error('Save color error:', err);
+    res.status(500).json({ error: 'server' });
+  }
+});
 
-  // Allow client to probe auth immediately after login without refresh
+// WebSocket handlers
+io.on('connection', (socket) => {
+  const userId = socket.request.session?.userId?.toString() || null;
+  console.log(`User connected: ${userId || 'anonymous'}`);
+
+  // Allow client to check auth status
   socket.on('auth_probe', (cb) => {
     const id = socket.request.session?.userId?.toString() || null;
     if (typeof cb === 'function') {
@@ -243,7 +309,7 @@ io.on('connection', (socket) => {
   
   socket.on('place_pixel', async ({ x, y, color }) => {
     try {
-      // Reload session to pick up latest login state
+      // Reload session for latest state
       const freshUserId = await new Promise((resolve) => {
         const sess = socket.request.session;
         if (sess && typeof sess.reload === 'function') {
@@ -260,11 +326,11 @@ io.on('connection', (socket) => {
         return socket.emit('err', 'invalid-coords');
       }
       
-      if (x < 0 || x >= 64 || y < 0 || y >= 64) {
+      if (x < 0 || x >= MAX_GRID || y < 0 || y >= MAX_GRID) {
         return socket.emit('err', 'out-of-bounds');
       }
       
-      // Validate color (basic hex check)
+      // Validate color format
       if (!color || typeof color !== 'string' || !/^#[0-9A-Fa-f]{6}$/.test(color)) {
         return socket.emit('err', 'invalid-color');
       }
@@ -274,12 +340,42 @@ io.on('connection', (socket) => {
       if (!user) {
         return socket.emit('err', 'user-not-found');
       }
-      
-      // Check cooldown
-      const now = Date.now();
-      if (user.lastPlacedAt && (now - user.lastPlacedAt.getTime()) < COOLDOWN_MS) {
-        const remaining = COOLDOWN_MS - (now - user.lastPlacedAt.getTime());
-        return socket.emit('cooldown', { left: remaining });
+
+      // Rate limiting
+      if (user.username !== ADMIN_USERNAME) {
+        const now = Date.now();
+        
+        // Check if we need to refill turns
+        if (user.lastTurnRefill && user.turnsRemaining < MAX_TURNS) {
+          const msSinceRefill = now - user.lastTurnRefill.getTime();
+          const turnsToRefill = Math.floor(msSinceRefill / TURN_REFILL_MS);
+          
+          if (turnsToRefill > 0) {
+            const newTurns = Math.min(MAX_TURNS, user.turnsRemaining + turnsToRefill);
+            user.turnsRemaining = newTurns;
+            
+            const actualRefilled = newTurns - user.turnsRemaining + turnsToRefill;
+            user.lastTurnRefill = new Date(user.lastTurnRefill.getTime() + (actualRefilled * TURN_REFILL_MS));
+            
+            // Clear refill timer if maxed out
+            if (user.turnsRemaining >= MAX_TURNS) {
+              user.lastTurnRefill = null;
+            }
+          }
+        }
+        
+        // Check if user has turns available
+        if (user.turnsRemaining <= 0) {
+          return socket.emit('err', 'no-turns');
+        }
+        
+        // Consume one turn
+        user.turnsRemaining--;
+        
+        // Start refill timer if turns depleted
+        if (user.turnsRemaining === 0) {
+          user.lastTurnRefill = new Date(now);
+        }
       }
       
       // Update or create pixel
@@ -293,8 +389,9 @@ io.on('connection', (socket) => {
         { upsert: true, new: true }
       );
       
-      // Update user's last placed time
+      // Update user stats and save
       user.lastPlacedAt = new Date();
+      user.pixelsPlaced = (user.pixelsPlaced || 0) + 1;
       await user.save();
       
       // Broadcast to all clients
@@ -305,6 +402,17 @@ io.on('connection', (socket) => {
         user: user.username,
         updatedAt: pixel.updatedAt
       });
+      
+      // Send turns update to this user
+      if (user.username !== ADMIN_USERNAME) {
+        const refillInfo = {
+          turnsRemaining: user.turnsRemaining,
+          lastTurnRefill: user.lastTurnRefill ? user.lastTurnRefill.getTime() : null,
+          maxTurns: MAX_TURNS,
+          refillMs: TURN_REFILL_MS
+        };
+        socket.emit('turns_update', refillInfo);
+      }
       
     } catch (error) {
       console.error('Place pixel error:', error);
@@ -318,8 +426,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// ==================== START SERVER ====================
-// Helpful error for common startup issues
+// Server startup
 server.on('error', (err) => {
   if (err && err.code === 'EADDRINUSE') {
     console.error(`\n✗ Port ${PORT} is already in use.`);

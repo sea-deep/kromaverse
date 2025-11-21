@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Documentation - KromaVerse</title>
+  <title>Project Report - KromaVerse</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
-  <meta name="description" content="Technical documentation for KromaVerse" />
+  <meta name="description" content="KromaVerse Technical Documentation & Project Report" />
   <link rel="stylesheet" href="main.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    body { line-height: 1.6; }
     .docs-page {
       flex: 1;
       overflow-y: auto;
@@ -27,87 +28,72 @@
     }
     .docs-content h1 {
       font-family: 'Fredoka', sans-serif;
-      font-size: 2.5rem;
+      font-size: 2.75rem;
       color: var(--accent-primary);
       margin-bottom: 0.5rem;
-    }
-    .docs-content .subtitle {
-      color: var(--text-muted);
-      font-size: 1rem;
-      margin-bottom: 2rem;
+      border-bottom: 3px solid var(--accent-primary);
+      padding-bottom: 0.75rem;
     }
     .docs-content h2 {
       font-family: 'Fredoka', sans-serif;
-      font-size: 1.8rem;
+      font-size: 2rem;
       color: var(--text-primary);
-      margin-top: 2.5rem;
-      margin-bottom: 1rem;
+      margin-top: 3rem;
+      margin-bottom: 1.25rem;
       padding-bottom: 0.5rem;
       border-bottom: 2px solid var(--border-light);
     }
     .docs-content h3 {
       font-family: 'Fredoka', sans-serif;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       color: var(--text-primary);
       margin-top: 2rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 1rem;
     }
     .docs-content h4 {
-      font-size: 1.1rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.2rem;
       color: var(--text-primary);
       margin-top: 1.5rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
       font-weight: 600;
     }
     .docs-content p {
-      line-height: 1.8;
+      line-height: 1.9;
       color: var(--text-secondary);
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
     }
     .docs-content ul, .docs-content ol {
-      margin: 1rem 0 1.5rem 1.5rem;
-      line-height: 1.8;
+      margin: 1rem 0 1.5rem 2rem;
+      line-height: 1.9;
       color: var(--text-secondary);
     }
     .docs-content li {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .docs-content strong {
+      color: var(--text-primary);
+      font-weight: 600;
     }
     .docs-content code {
+      font-family: 'JetBrains Mono', monospace;
       background: var(--bg-secondary);
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
-      font-family: 'Courier New', monospace;
       font-size: 0.9em;
-      color: var(--accent-primary);
+      color: var(--accent-secondary);
     }
-    .docs-content pre {
-      background: var(--bg-secondary);
-      padding: 1.25rem;
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1.5rem;
       border-radius: var(--radius-md);
       overflow-x: auto;
-      margin: 1rem 0;
-      border: 2px solid var(--border-light);
-    }
-    .docs-content pre code {
-      background: none;
-      padding: 0;
-      color: var(--text-primary);
-    }
-    .docs-content table {
-      width: 100%;
-      border-collapse: collapse;
       margin: 1.5rem 0;
-    }
-    .docs-content th {
-      background: var(--bg-secondary);
-      padding: 0.75rem;
-      text-align: left;
-      font-weight: 600;
-      border: 2px solid var(--border-light);
-    }
-    .docs-content td {
-      padding: 0.75rem;
-      border: 2px solid var(--border-light);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      border: 1px solid #333;
     }
     .info-box {
       background: var(--bg-secondary);
@@ -116,70 +102,66 @@
       border-radius: var(--radius-md);
       margin: 1.5rem 0;
     }
-    .warning-box {
-      background: #fffaf0;
-      border-left: 4px solid var(--warning);
-      padding: 1.25rem;
-      border-radius: var(--radius-md);
-      margin: 1.5rem 0;
+    .info-box strong {
+      color: var(--accent-secondary);
+    }
+    .section-divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+      margin: 3rem 0;
     }
     @media (max-width: 768px) {
-      .docs-page {
-        padding: 1rem;
-      }
-      .docs-content {
-        padding: 1.5rem;
-      }
-      .docs-content h1 {
-        font-size: 2rem;
-      }
-      .docs-content h2 {
-        font-size: 1.5rem;
-      }
-    }
-    @media print {
-      .topbar {
-        display: none;
-      }
-      .docs-page {
-        padding: 0;
-      }
-      .docs-content {
-        box-shadow: none;
-        border: none;
-        padding: 1rem;
-      }
-      .docs-content h1, .docs-content h2 {
-        page-break-after: avoid;
-      }
-      pre, table {
-        page-break-inside: avoid;
-      }
+      .docs-page { padding: 1rem; }
+      .docs-content { padding: 1.5rem; }
+      .docs-content h1 { font-size: 2rem; }
+      .docs-content h2 { font-size: 1.6rem; }
+      .docs-content h3 { font-size: 1.3rem; }
+      .code-block { padding: 1rem; font-size: 0.85rem; }
     }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
-      <span class="brand-icon">🎨</span>
+      <span class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Palette">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M7 10a2 2 0 1 1 0-4" />
+          <path d="M12 8a2 2 0 1 1 0-4" />
+          <path d="M17 10a2 2 0 1 1 0-4" />
+          <path d="M15 16c0 1.5-1.2 2-2.5 2H12a3 3 0 0 1 0-6h1.5a3.5 3.5 0 0 1 3.5 3.5" />
+        </svg>
+      </span>
       <span class="brand-text">KromaVerse</span>
     </div>
-    <div id="mobileAuth" class="mobile-auth" style="display:none;"></div>
     <nav class="menu">
-      <a href="/" class="menu-link">
-        <span class="menu-icon">🏠</span>
+      <a href="/" class="menu-link" aria-label="Canvas">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12l9-9 9 9" />
+          <path d="M4 11v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9" />
+        </svg>
         <span>Canvas</span>
       </a>
-      <a href="/info" class="menu-link">
-        <span class="menu-icon">ℹ️</span>
+      <a href="/info" class="menu-link" aria-label="Info">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="10" x2="12" y2="16" />
+          <circle cx="12" cy="7" r="1" />
+        </svg>
         <span>Info</span>
       </a>
-      <a href="/docs" class="menu-link">
-        <span class="menu-icon">📚</span>
+      <a href="/docs" class="menu-link" aria-label="Docs">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 2h8l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+          <path d="M15 2v5h5" />
+        </svg>
         <span>Docs</span>
       </a>
-      <a href="https://github.com/sea-deep/kromaverse" target="_blank" rel="noopener noreferrer" class="menu-link">
-        <span class="menu-icon">🐙</span>
+      <a href="https://github.com/sea-deep/kromaverse" target="_blank" rel="noopener noreferrer" class="menu-link" aria-label="GitHub">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.58 2 12.14c0 4.47 2.87 8.26 6.84 9.62.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.36-3.37-1.36-.45-1.17-1.11-1.48-1.11-1.48-.91-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.12 2.94.86.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.13-4.56-5 0-1.11.39-2.02 1.03-2.73-.1-.26-.45-1.3.1-2.71 0 0 .84-.27 2.75 1.04a9.38 9.38 0 0 1 5 0c1.9-1.31 2.74-1.04 2.74-1.04.55 1.41.2 2.45.1 2.71.64.71 1.03 1.62 1.03 2.73 0 3.88-2.34 4.74-4.57 4.99.36.32.68.95.68 1.92 0 1.39-.01 2.51-.01 2.85 0 .26.18.58.69.48A10.02 10.02 0 0 0 22 12.14C22 6.58 17.52 2 12 2z" />
+        </svg>
         <span>GitHub</span>
       </a>
     </nav>
@@ -187,495 +169,478 @@
 
   <main class="docs-page">
     <div class="docs-content">
-      <h1>📚 KromaVerse Technical Documentation</h1>
-      <p class="subtitle">Version 1.0.0 | Last Updated: November 2025</p>
+      <h1>📚 KromaVerse Project Report</h1>
+      <p style="font-size:1.1rem;color:var(--text-primary);margin-bottom:2rem;">A comprehensive technical documentation of the collaborative pixel art platform</p>
 
-      <h2>1. Project Overview</h2>
-      <p>KromaVerse is a collaborative real-time pixel art canvas built with modern web technologies. It enables multiple users to place colored pixels on a shared 64×64 grid, creating a dynamic and ever-evolving digital artwork space.</p>
+      <hr class="section-divider">
 
-      <h3>1.1 Key Features</h3>
-      <ul>
-        <li>Real-time collaborative pixel placement using WebSocket connections</li>
-        <li>User authentication and session management</li>
-        <li>3-second cooldown period between pixel placements</li>
-        <li>Responsive design optimized for desktop and mobile devices</li>
-        <li>Persistent data storage in MongoDB</li>
-        <li>11 preset colors plus custom color picker</li>
-      </ul>
-
-      <h3>1.2 Technology Stack</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Component</th>
-            <th>Technology</th>
-            <th>Version</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Backend Runtime</td>
-            <td>Node.js</td>
-            <td>18+</td>
-          </tr>
-          <tr>
-            <td>Web Framework</td>
-            <td>Express.js</td>
-            <td>5.1.0</td>
-          </tr>
-          <tr>
-            <td>Real-time Engine</td>
-            <td>Socket.IO</td>
-            <td>4.8.1</td>
-          </tr>
-          <tr>
-            <td>Database</td>
-            <td>MongoDB</td>
-            <td>8.x</td>
-          </tr>
-          <tr>
-            <td>ODM</td>
-            <td>Mongoose</td>
-            <td>8.19.4</td>
-          </tr>
-          <tr>
-            <td>Session Store</td>
-            <td>connect-mongo</td>
-            <td>5.1.0</td>
-          </tr>
-          <tr>
-            <td>Password Hashing</td>
-            <td>bcryptjs</td>
-            <td>3.0.3</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>2. Architecture</h2>
-
-      <h3>2.1 System Architecture</h3>
-      <p>KromaVerse follows a client-server architecture with real-time bidirectional communication:</p>
-      <ul>
-        <li><strong>Client:</strong> Vanilla JavaScript SPA with Socket.IO client</li>
-        <li><strong>Server:</strong> Node.js/Express with Socket.IO server</li>
-        <li><strong>Database:</strong> MongoDB for persistent storage</li>
-        <li><strong>Session Management:</strong> Express-session with MongoStore</li>
-      </ul>
-
-      <h3>2.2 Data Models</h3>
-
-      <h4>User Model</h4>
-      <pre><code>{
-  username: String (required, unique),
-  passwordHash: String (required),
-  lastPlacedAt: Date (default: null)
-}</code></pre>
-
-      <h4>Pixel Model</h4>
-      <pre><code>{
-  x: Number (0-63, required),
-  y: Number (0-63, required),
-  color: String (hex color, required),
-  user: ObjectId (ref: User, required),
-  updatedAt: Date (required)
-}</code></pre>
-
-      <h3>2.3 Directory Structure</h3>
-      <pre><code>src/
-├── index.js              # Main server file
-├── package.json          # Dependencies
-├── purge-db.js          # Database cleanup utility
-├── .env                 # Environment variables
-├── frontend/
-│   ├── index.html       # Main canvas page
-│   ├── info.html        # Information page
-│   ├── docs.html        # Documentation page
-│   ├── main.css         # Global styles
-│   └── main.js          # Client-side logic
-└── models/
-    ├── User.js          # User schema
-    └── Pixel.js         # Pixel schema</code></pre>
-
-      <h2>3. API Reference</h2>
-
-      <h3>3.1 REST API Endpoints</h3>
-
-      <h4>POST /api/register</h4>
-      <p><strong>Description:</strong> Register a new user account</p>
-      <p><strong>Request Body:</strong></p>
-      <pre><code>{
-  "username": "string",
-  "password": "string"
-}</code></pre>
-      <p><strong>Response:</strong></p>
-      <pre><code>{
-  "ok": true,
-  "user": {
-    "id": "ObjectId",
-    "username": "string"
-  }
-}</code></pre>
-
-      <h4>POST /api/login</h4>
-      <p><strong>Description:</strong> Authenticate user and create session</p>
-      <p><strong>Request Body:</strong></p>
-      <pre><code>{
-  "username": "string",
-  "password": "string"
-}</code></pre>
-      <p><strong>Response:</strong></p>
-      <pre><code>{
-  "ok": true,
-  "user": {
-    "id": "ObjectId",
-    "username": "string"
-  }
-}</code></pre>
-
-      <h4>POST /api/logout</h4>
-      <p><strong>Description:</strong> Destroy user session</p>
-      <p><strong>Response:</strong></p>
-      <pre><code>{ "ok": true }</code></pre>
-
-      <h4>GET /api/me</h4>
-      <p><strong>Description:</strong> Get current authenticated user</p>
-      <p><strong>Response:</strong></p>
-      <pre><code>{
-  "user": {
-    "_id": "ObjectId",
-    "username": "string",
-    "lastPlacedAt": "Date"
-  }
-}</code></pre>
-
-      <h4>GET /api/pixels</h4>
-      <p><strong>Description:</strong> Retrieve all placed pixels</p>
-      <p><strong>Response:</strong></p>
-      <pre><code>{
-  "pixels": [
-    {
-      "x": 0-63,
-      "y": 0-63,
-      "color": "#RRGGBB",
-      "updatedAt": "Date"
-    }
-  ]
-}</code></pre>
-
-      <h3>3.2 Socket.IO Events</h3>
-
-      <h4>Client → Server</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>Event</th>
-            <th>Payload</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>place_pixel</code></td>
-            <td><code>{ x, y, color }</code></td>
-            <td>Request to place a pixel at coordinates (x,y) with specified color</td>
-          </tr>
-          <tr>
-            <td><code>auth_probe</code></td>
-            <td>None</td>
-            <td>Check authentication status</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h4>Server → Client</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>Event</th>
-            <th>Payload</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>pixel_update</code></td>
-            <td><code>{ x, y, color, user, updatedAt }</code></td>
-            <td>Broadcast when any pixel is placed</td>
-          </tr>
-          <tr>
-            <td><code>err</code></td>
-            <td><code>"error_code"</code></td>
-            <td>Error notification (not-auth, invalid-coords, etc.)</td>
-          </tr>
-          <tr>
-            <td><code>auth_status</code></td>
-            <td><code>{ authenticated, userId }</code></td>
-            <td>Response to auth_probe</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>4. Configuration</h2>
-
-      <h3>4.1 Environment Variables</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Variable</th>
-            <th>Description</th>
-            <th>Default</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>MONGO</code></td>
-            <td>MongoDB connection string</td>
-            <td>mongodb://localhost:27017/kromaverse</td>
-          </tr>
-          <tr>
-            <td><code>MONGO_DB</code></td>
-            <td>Database name</td>
-            <td>kromaverse</td>
-          </tr>
-          <tr>
-            <td><code>PORT</code></td>
-            <td>Server port</td>
-            <td>3000</td>
-          </tr>
-          <tr>
-            <td><code>SESSION_SECRET</code></td>
-            <td>Session signing secret</td>
-            <td>change_this_secret_key</td>
-          </tr>
-          <tr>
-            <td><code>NODE_ENV</code></td>
-            <td>Environment mode</td>
-            <td>development</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="warning-box">
-        <strong>⚠️ Security Warning:</strong> Always use a strong, random <code>SESSION_SECRET</code> in production. Never commit <code>.env</code> files to version control.
-      </div>
-
-      <h3>4.2 Session Configuration</h3>
-      <ul>
-        <li><strong>Cookie Max Age:</strong> 24 hours</li>
-        <li><strong>Cookie Security:</strong> Secure flag enabled in production</li>
-        <li><strong>SameSite Policy:</strong> Lax</li>
-        <li><strong>HTTP Only:</strong> Enabled</li>
-        <li><strong>Store:</strong> MongoDB (connect-mongo)</li>
-      </ul>
-
-      <h2>5. Deployment</h2>
-
-      <h3>5.1 Prerequisites</h3>
-      <ul>
-        <li>Node.js 18+ installed</li>
-        <li>MongoDB 6+ running and accessible</li>
-        <li>npm or yarn package manager</li>
-      </ul>
-
-      <h3>5.2 Installation Steps</h3>
-      <pre><code># Clone the repository
-git clone https://github.com/sea-deep/kromaverse.git
-
-# Navigate to project directory
-cd kromaverse/src
-
-# Install dependencies
-npm install
-
-# Create .env file
-cp .env.example .env
-
-# Edit .env with your configuration
-nano .env
-
-# Start the server
-npm start</code></pre>
-
-      <h3>5.3 Production Deployment (Railway)</h3>
-      <ol>
-        <li>Set environment variables in Railway dashboard:
-          <ul>
-            <li><code>MONGO</code> - MongoDB Atlas connection string</li>
-            <li><code>SESSION_SECRET</code> - Strong random string</li>
-            <li><code>NODE_ENV=production</code></li>
-          </ul>
-        </li>
-        <li>Enable automatic deployments from GitHub</li>
-        <li>Railway will automatically set <code>PORT</code></li>
-      </ol>
+      <h2>🎯 Project Overview</h2>
+      <p><strong>KromaVerse</strong> is a real-time collaborative pixel art canvas inspired by Reddit's r/place. It allows multiple users to place colored pixels on a shared 128×128 grid, creating a dynamic and ever-evolving digital canvas. The project implements a turn-based rate limiting system to balance user participation while preventing spam.</p>
 
       <div class="info-box">
-        <strong>💡 Tip:</strong> Use MongoDB Atlas for managed database hosting. Free tier includes 512MB storage, sufficient for thousands of users.
-      </div>
-
-      <h2>6. Database Maintenance</h2>
-
-      <h3>6.1 Purging Database</h3>
-      <p>To reset the canvas and remove all users:</p>
-      <pre><code>node purge-db.js</code></pre>
-
-      <h3>6.2 Backup & Restore</h3>
-      <pre><code># Backup
-mongodump --uri="mongodb://..." --db=kromaverse --out=backup/
-
-# Restore
-mongorestore --uri="mongodb://..." --db=kromaverse backup/kromaverse/</code></pre>
-
-      <h2>7. Client-Side Architecture</h2>
-
-      <h3>7.1 State Management</h3>
-      <p>The client maintains the following state variables:</p>
-      <ul>
-        <li><code>user</code> - Current authenticated user object</li>
-        <li><code>selectedColor</code> - Currently selected color</li>
-        <li><code>cooldownLeft</code> - Remaining cooldown time (seconds)</li>
-        <li><code>scale</code> - Canvas zoom level</li>
-        <li><code>translateX/Y</code> - Canvas pan position</li>
-        <li><code>pixelCount</code> - Total pixels placed on canvas</li>
-      </ul>
-
-      <h3>7.2 Cooldown Mechanism</h3>
-      <p>The cooldown timer is implemented entirely on the frontend:</p>
-      <ul>
-        <li>Starts immediately when user places a pixel (3 seconds)</li>
-        <li>Counts down every second using <code>setInterval</code></li>
-        <li>Blocks pixel placement when <code>cooldownLeft > 0</code></li>
-        <li>Updates UI with countdown display</li>
-      </ul>
-
-      <div class="info-box">
-        <strong>ℹ️ Note:</strong> Server-side cooldown validation was removed for simplicity. Consider re-adding for production deployments to prevent abuse.
-      </div>
-
-      <h3>7.3 Canvas Rendering</h3>
-      <p>The 64×64 grid is rendered as a CSS Grid with the following optimizations:</p>
-      <ul>
-        <li>Cells are 10×10 pixels each</li>
-        <li>Image rendering set to pixelated/crisp-edges</li>
-        <li>Transform-based pan/zoom for hardware acceleration</li>
-        <li>Touch gesture support for mobile devices</li>
-      </ul>
-
-      <h2>8. Security Considerations</h2>
-
-      <h3>8.1 Authentication</h3>
-      <ul>
-        <li>Passwords hashed with bcrypt (10 rounds)</li>
-        <li>Sessions stored in MongoDB, not memory</li>
-        <li>Session cookies are HTTP-only to prevent XSS</li>
-        <li>Secure flag enabled in production (HTTPS only)</li>
-      </ul>
-
-      <h3>8.2 Input Validation</h3>
-      <ul>
-        <li>Pixel coordinates validated (0-63 range)</li>
-        <li>Color format validated (hex color regex)</li>
-        <li>Username uniqueness enforced at database level</li>
-      </ul>
-
-      <h3>8.3 Rate Limiting</h3>
-      <div class="warning-box">
-        <strong>⚠️ TODO:</strong> Current implementation lacks rate limiting. Consider adding:
-        <ul>
-          <li>Express rate-limit middleware for API endpoints</li>
-          <li>Socket.IO rate limiting for pixel placement</li>
-          <li>IP-based rate limiting for registration</li>
+        <strong>Key Features:</strong>
+        <ul style="margin-left:1.5rem;margin-top:0.5rem;">
+          <li>128×128 shared canvas with real-time updates via WebSocket</li>
+          <li>Turn-based rate limiting (64 turns, 1 per 10s refill)</li>
+          <li>24 preset colors + custom color picker with personal history</li>
+          <li>Canvas optimization using HTML5 Canvas API (replaced 16k DOM elements)</li>
+          <li>User authentication with session management</li>
+          <li>MongoDB persistence for pixels and user data</li>
         </ul>
       </div>
 
-      <h2>9. Performance Optimization</h2>
+      <h2>🏗️ System Architecture</h2>
 
-      <h3>9.1 Database Indexes</h3>
-      <p>The following indexes are automatically created:</p>
+      <h3>Technology Stack</h3>
       <ul>
-        <li><code>users.username</code> - Unique index for fast lookups</li>
-        <li><code>pixels.{x, y}</code> - Compound index for upsert operations</li>
+        <li><strong>Backend:</strong> Node.js with Express 5.1.0</li>
+        <li><strong>Real-time Communication:</strong> Socket.IO 4.8.1</li>
+        <li><strong>Database:</strong> MongoDB 8.19.4 with Mongoose ODM</li>
+        <li><strong>Session Management:</strong> express-session with MongoStore</li>
+        <li><strong>Authentication:</strong> bcrypt for password hashing</li>
+        <li><strong>Frontend:</strong> Vanilla JavaScript with Canvas API</li>
+        <li><strong>Styling:</strong> Custom CSS with CSS Variables</li>
       </ul>
 
-      <h3>9.2 Frontend Optimizations</h3>
+      <h3>Project Structure</h3>
+      <div class="code-block">src/
+├── index.js              # Express server, Socket.IO, API routes
+├── models/
+│   ├── User.js          # User schema (auth, turns, custom colors)
+│   └── Pixel.js         # Pixel schema (position, color, owner)
+└── frontend/
+    ├── index.html       # Main canvas interface
+    ├── info.html        # User guide
+    ├── docs.html        # Technical documentation
+    ├── main.js          # Client-side logic
+    └── main.css         # Styles</div>
+
+      <hr class="section-divider">
+
+      <h2>🔧 Backend Architecture</h2>
+
+      <h3>Server Configuration (src/index.js)</h3>
+      <p>The backend is built on Express.js with Socket.IO for real-time bidirectional communication between server and clients.</p>
+
+      <h4>Core Dependencies</h4>
+<div class="code-block">const express = require('express');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');</div>
+
+      <h4>Session Management</h4>
+      <p>Sessions are stored in MongoDB using <code>connect-mongo</code> to persist user authentication across server restarts. Sessions are configured with:</p>
       <ul>
-        <li>CSS Grid for efficient cell rendering</li>
-        <li>Hardware-accelerated transforms for pan/zoom</li>
-        <li>Event delegation for cell clicks</li>
-        <li>Debounced pan/zoom updates</li>
+        <li><strong>Secret:</strong> Environment variable for session signing</li>
+        <li><strong>Cookie Settings:</strong> HttpOnly, SameSite: 'lax', 7-day maxAge</li>
+        <li><strong>Proxy Trust:</strong> Enabled for deployment behind reverse proxies</li>
+        <li><strong>Resave & SaveUninitialized:</strong> Both false for optimal performance</li>
       </ul>
 
-      <h2>10. Browser Compatibility</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Browser</th>
-            <th>Minimum Version</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Chrome</td>
-            <td>90+</td>
-            <td>Fully supported</td>
-          </tr>
-          <tr>
-            <td>Firefox</td>
-            <td>88+</td>
-            <td>Fully supported</td>
-          </tr>
-          <tr>
-            <td>Safari</td>
-            <td>14+</td>
-            <td>Fully supported</td>
-          </tr>
-          <tr>
-            <td>Edge</td>
-            <td>90+</td>
-            <td>Fully supported</td>
-          </tr>
-          <tr>
-            <td>Mobile Safari</td>
-            <td>iOS 14+</td>
-            <td>Touch gestures supported</td>
-          </tr>
-          <tr>
-            <td>Chrome Mobile</td>
-            <td>90+</td>
-            <td>Touch gestures supported</td>
-          </tr>
-        </tbody>
-      </table>
+      <h4>Socket.IO Integration</h4>
+      <p>Socket.IO is integrated with Express session middleware to access user sessions in Socket.IO event handlers:</p>
+<div class="code-block">io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, next);
+});</div>
+      <p>This allows retrieving <code>socket.request.session.userId</code> in real-time events like <code>place_pixel</code>.</p>
 
-      <h2>11. Troubleshooting</h2>
+      <h3>Data Models</h3>
 
-      <h3>11.1 Common Issues</h3>
+      <h4>User Model (src/models/User.js)</h4>
+<div class="code-block">const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true }, // bcrypt hashed
+  pixelsPlaced: { type: Number, default: 0 },
+  lastPlacedAt: Date,
+  turnsRemaining: { type: Number, default: 64 },
+  lastTurnRefill: Date,
+  customColors: [String] // Last 6 custom colors (hex format)
+});</div>
+      <p><strong>Purpose:</strong> Stores user credentials, rate limiting state, and personalized color preferences.</p>
 
-      <h4>Session not persisting</h4>
+      <h4>Pixel Model (src/models/Pixel.js)</h4>
+<div class="code-block">const PixelSchema = new mongoose.Schema({
+  x: { type: Number, required: true },
+  y: { type: Number, required: true },
+  color: { type: String, required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  updatedAt: { type: Date, default: Date.now }
+});
+PixelSchema.index({ x: 1, y: 1 }, { unique: true });</div>
+      <p><strong>Purpose:</strong> Stores pixel state on the canvas. Compound index on <code>(x, y)</code> ensures uniqueness and fast lookups.</p>
+
+      <h3>API Endpoints</h3>
+
+      <h4>Authentication Endpoints</h4>
       <ul>
-        <li>Verify <code>SESSION_SECRET</code> is set</li>
-        <li>Check MongoDB connection</li>
-        <li>Enable <code>trust proxy</code> if behind proxy (Railway, Heroku)</li>
-        <li>Ensure cookies are not blocked by browser</li>
+        <li><code>POST /api/register</code> — Creates new user with hashed password</li>
+        <li><code>POST /api/login</code> — Authenticates user and creates session</li>
+        <li><code>POST /api/logout</code> — Destroys session</li>
+        <li><code>GET /api/me</code> — Returns current user data with turn refill calculation</li>
       </ul>
 
-      <h4>WebSocket connection fails</h4>
+      <h4>Data Endpoints</h4>
       <ul>
-        <li>Check CORS configuration</li>
-        <li>Verify Socket.IO version compatibility</li>
-        <li>Check for proxy/firewall blocking WebSocket protocol</li>
+        <li><code>GET /api/pixels</code> — Returns all placed pixels for canvas initialization</li>
+        <li><code>POST /api/color</code> — Saves custom color to user's history (last 6 max)</li>
       </ul>
 
-      <h4>Database connection errors</h4>
+      <h3>Real-time Events (Socket.IO)</h3>
+
+      <h4>Client → Server Events</h4>
+      <p><strong><code>place_pixel</code></strong> — Triggered when user clicks a cell</p>
+      <div class="code-block">socket.on('place_pixel', async ({ x, y, color }) => {
+  // 1. Validate session and get user
+  // 2. Check rate limits (refill if at 0)
+  // 3. Verify turns available
+  // 4. Consume 1 turn
+  // 5. Update/create pixel in database
+  // 6. Broadcast to all clients
+  // 7. Send turn update to user
+});</div>
+
+      <h4>Server → Client Events</h4>
       <ul>
-        <li>Verify MongoDB is running</li>
-        <li>Check connection string format</li>
-        <li>Ensure database user has proper permissions</li>
-        <li>For Atlas: whitelist server IP address</li>
+        <li><code>pixel_update</code> — Broadcasts pixel placement to all connected clients</li>
+        <li><code>turns_update</code> — Sends updated turn count to specific user</li>
+        <li><code>err</code> — Sends error messages (not-auth, no-turns, etc.)</li>
       </ul>
 
-      <hr style="margin: 2rem 0; border: none; border-top: 2px solid var(--border-light);">
+      <hr class="section-divider">
+
+      <h2>⚡ Rate Limiting System</h2>
+      <p>The turn-based rate limiting system is the core mechanism controlling user activity. It prevents spam while encouraging strategic pixel placement.</p>
+
+      <h3>System Logic</h3>
+      <div class="info-box">
+        <strong>Rate Limiting Rules:</strong>
+        <ol style="margin-left:1.5rem;margin-top:0.5rem;">
+          <li>Users start with 64 turns (MAX_TURNS)</li>
+          <li>Each pixel placement consumes 1 turn</li>
+          <li>Refilling ONLY starts when turns reach exactly 0</li>
+          <li>Refill rate: +1 turn per 10 seconds (TURN_REFILL_MS = 10000ms)</li>
+          <li>Refilling stops when turns reach 64</li>
+          <li>Admin users bypass all rate limits</li>
+        </ol>
+      </div>
+
+      <h3>Server-side Implementation</h3>
+      <p>The rate limiting logic runs during <code>place_pixel</code> event handling:</p>
+<div class="code-block">// Step 1: Refill check (only if at 0 turns)
+if (user.turnsRemaining === 0 && user.lastTurnRefill) {
+  const now = Date.now();
+  const msSinceRefill = now - user.lastTurnRefill.getTime();
+  const turnsToRefill = Math.floor(msSinceRefill / TURN_REFILL_MS);
+  
+  if (turnsToRefill > 0) {
+    // Refill turns (cap at MAX_TURNS)
+    user.turnsRemaining = Math.min(MAX_TURNS, turnsToRefill);
+    // Update refill timestamp
+    user.lastTurnRefill = new Date(
+      user.lastTurnRefill.getTime() + (turnsToRefill * TURN_REFILL_MS)
+    );
+    
+    // Clear timer if maxed out
+    if (user.turnsRemaining >= MAX_TURNS) {
+      user.lastTurnRefill = null;
+    }
+  }
+}
+
+// Step 2: Check turns availability
+if (user.turnsRemaining <= 0) {
+  return socket.emit('err', 'no-turns');
+}
+
+// Step 3: Consume turn
+user.turnsRemaining--;
+
+// Step 4: Start refill timer if hit 0
+if (user.turnsRemaining === 0) {
+  user.lastTurnRefill = new Date(now);
+}</div>
+
+      <h3>Client-side Refill Timer</h3>
+      <p>The client displays a countdown timer when turns reach 0, polling the server every second to check for refilled turns:</p>
+<div class="code-block">function startRefillTimer() {
+  if (turnsRemaining === 0 && lastTurnRefill) {
+    refillTimerEl.style.display = 'block';
+    
+    refillTimerInterval = setInterval(async () => {
+      const now = Date.now();
+      const msSinceRefill = now - lastTurnRefill;
+      const secondsUntilNext = Math.ceil(
+        (refillMs - (msSinceRefill % refillMs)) / 1000
+      );
+      
+      // Update countdown display
+      document.getElementById('refillSeconds').textContent = secondsUntilNext;
+      
+      // Check if turns should be refilled
+      const turnsToRefill = Math.floor(msSinceRefill / refillMs);
+      if (turnsToRefill > 0) {
+        // Fetch updated turns from server
+        const response = await fetch('/api/me');
+        const data = await response.json();
+        turnsRemaining = data.user.turnsRemaining;
+        updateTurnsDisplay();
+        
+        // Stop timer if turns refilled
+        if (turnsRemaining > 0) {
+          clearInterval(refillTimerInterval);
+          refillTimerEl.style.display = 'none';
+        }
+      }
+    }, 1000);
+  }
+}</div>
+
+      <h3>Admin Bypass</h3>
+      <p>Users with username <code>'admin'</code> bypass all rate limiting for moderation purposes:</p>
+<div class="code-block">if (user.username !== ADMIN_USERNAME) {
+  // Rate limiting logic
+}</div>
+
+      <hr class="section-divider">
+
+      <h2>🎨 Frontend Architecture</h2>
+
+      <h3>Canvas Rendering System</h3>
+      <p>The canvas was originally implemented with 16,384 individual <code>&lt;div&gt;</code> elements (128×128 grid), consuming ~822MB RAM. This was optimized by replacing the DOM-based approach with a single HTML5 <code>&lt;canvas&gt;</code> element, reducing memory usage to ~50-100MB.</p>
+
+      <h4>Canvas Initialization</h4>
+<div class="code-block">const gridCanvas = document.getElementById('gridCanvas');
+const gridCtx = gridCanvas.getContext('2d', { alpha: false });
+
+// Set canvas dimensions
+gridCanvas.width = GRID_SIZE * CELL_SIZE;  // 128 * 10 = 1280px
+gridCanvas.height = GRID_SIZE * CELL_SIZE;
+
+// Disable image smoothing for crisp pixels
+gridCtx.imageSmoothingEnabled = false;
+
+// Fill with white background
+gridCtx.fillStyle = '#FFFFFF';
+gridCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
+
+// Draw grid lines
+gridCtx.strokeStyle = 'rgba(203, 213, 224, 0.4)';
+gridCtx.lineWidth = 0.5;
+for (let i = 0; i <= GRID_SIZE; i++) {
+  // Vertical & horizontal lines
+  gridCtx.beginPath();
+  gridCtx.moveTo(i * CELL_SIZE, 0);
+  gridCtx.lineTo(i * CELL_SIZE, gridCanvas.height);
+  gridCtx.stroke();
+  // ... horizontal lines
+}</div>
+
+      <h4>Pixel Painting Function</h4>
+<div class="code-block">function paintCell(x, y, color) {
+  if (!gridCtx) return;
+  
+  // Fill cell with color
+  gridCtx.fillStyle = color;
+  gridCtx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+  
+  // Redraw grid border for this cell
+  gridCtx.strokeStyle = 'rgba(203, 213, 224, 0.4)';
+  gridCtx.lineWidth = 0.5;
+  gridCtx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+}</div>
+
+      <h3>Pan & Zoom System</h3>
+      <p>Canvas transform is managed via CSS <code>transform</code> property for hardware-accelerated rendering:</p>
+<div class="code-block">function updateTransform() {
+  // Calculate pan limits (75% beyond edges)
+  const canvasSize = GRID_SIZE * CELL_SIZE * scale;
+  const maxPan = canvasSize * 0.75;
+  
+  // Clamp translate values
+  translateX = Math.max(-maxPan, Math.min(maxPan, translateX));
+  translateY = Math.max(-maxPan, Math.min(maxPan, translateY));
+  
+  // Apply transform
+  gridCanvas.style.transform = `
+    translate(-50%, -50%)
+    translate(${translateX}px, ${translateY}px)
+    scale(${scale})
+  `;
+}</div>
+
+      <h4>Input Handling</h4>
+      <ul>
+        <li><strong>Zoom:</strong> Mouse wheel event adjusts <code>scale</code> variable (0.5x - 3x)</li>
+        <li><strong>Pan:</strong> Mouse/touch drag updates <code>translateX/Y</code> variables</li>
+        <li><strong>Click Detection:</strong> Converts screen coordinates to grid coordinates accounting for transform</li>
+      </ul>
+
+<div class="code-block">function onCanvasClick(e) {
+  const rect = gridCanvas.getBoundingClientRect();
+  const clientX = e.type === 'touchend' 
+    ? e.changedTouches[0].clientX 
+    : e.clientX;
+  const clientY = e.type === 'touchend' 
+    ? e.changedTouches[0].clientY 
+    : e.clientY;
+  
+  // Convert screen coordinates to canvas coordinates
+  const canvasX = (clientX - rect.left) / (rect.width / GRID_SIZE);
+  const canvasY = (clientY - rect.top) / (rect.height / GRID_SIZE);
+  
+  const gridX = Math.floor(canvasX);
+  const gridY = Math.floor(canvasY);
+  
+  // Emit pixel placement
+  socket.emit('place_pixel', { x: gridX, y: gridY, color: currentColor });
+}</div>
+
+      <h3>Color Palette System</h3>
+      <p>The palette combines 24 preset colors with a custom picker. User's last 6 custom colors replace the tail of the preset palette.</p>
+
+<div class="code-block">const BASE_PALETTE = [
+  '#FF0000','#FF7F00','#FFB300','#FFFF00',
+  '#A8FF00','#00FF00','#00FF7F','#00FFC8',
+  '#00FFFF','#00BFFF','#008CFF','#0000FF',
+  '#4B0082','#8B00FF','#FF00FF','#FF69B4',
+  '#FF1493','#DC143C','#8B4513','#000000',
+  '#808080','#C0C0C0','#FFFFFF','#FFD700'
+];
+
+function rebuildPalette() {
+  const displayColors = [...BASE_PALETTE];
+  
+  // Replace last 6 with user's custom colors
+  if (customColors.length > 0) {
+    const replaceCount = Math.min(6, customColors.length);
+    const startIdx = BASE_PALETTE.length - replaceCount;
+    customColors.slice(-6).forEach((c, i) => {
+      displayColors[startIdx + i] = c;
+    });
+  }
+  
+  // Render swatches + picker
+  // ...
+}</div>
+
+      <h4>Custom Color Saving</h4>
+      <p>When a user picks a custom color, it's debounced (500ms) to prevent database spam during color slider dragging:</p>
+<div class="code-block">colorPickerInp.addEventListener('input', () => {
+  clearTimeout(pickerDebounceTimer);
+  pickerDebounceTimer = setTimeout(async () => {
+    if (!user) return;
+    const color = colorPickerInp.value.toUpperCase();
+    
+    // Save to server
+    await fetch('/api/color', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ color })
+    });
+    
+    // Update local array
+    customColors = customColors.filter(c => c !== color);
+    customColors.push(color);
+    if (customColors.length > 6) customColors.shift();
+    
+    rebuildPalette();
+  }, 500);
+});</div>
+
+      <h3>Real-time Updates</h3>
+      <p>Socket.IO handlers ensure all clients see pixel updates instantly:</p>
+<div class="code-block">socket.on('pixel_update', ({ x, y, color, user: username }) => {
+  paintCell(x, y, color);
+  pixelCount++;
+  updatePixelCount();
+  
+  // Update own pixel count if this was our pixel
+  if (username === user?.username) {
+    user.pixelsPlaced++;
+    document.getElementById('pixelsCount').textContent = user.pixelsPlaced;
+  }
+});
+
+socket.on('turns_update', (data) => {
+  turnsRemaining = data.turnsRemaining;
+  lastTurnRefill = data.lastTurnRefill;
+  updateTurnsDisplay();
+  startRefillTimer();
+});</div>
+
+      <hr class="section-divider">
+
+      <h2>🔐 Security & Session Management</h2>
+
+      <h3>Password Security</h3>
+      <ul>
+        <li><strong>Hashing:</strong> Passwords hashed with bcrypt (10 rounds) before storage</li>
+        <li><strong>No plaintext:</strong> Original passwords never stored in database</li>
+        <li><strong>Verification:</strong> <code>bcrypt.compare()</code> used for login authentication</li>
+      </ul>
+
+      <h3>Session Security</h3>
+      <ul>
+        <li><strong>HttpOnly cookies:</strong> Prevents JavaScript access to session cookies</li>
+        <li><strong>SameSite: lax:</strong> CSRF protection while allowing navigation</li>
+        <li><strong>Secure in production:</strong> HTTPS-only cookies when NODE_ENV=production</li>
+        <li><strong>MongoDB persistence:</strong> Sessions survive server restarts</li>
+      </ul>
+
+      <h3>Input Validation</h3>
+      <ul>
+        <li><strong>Coordinates:</strong> Validated to be within 0-127 range</li>
+        <li><strong>Color format:</strong> Regex <code>/^#[0-9A-Fa-f]{6}$/</code> ensures valid hex</li>
+        <li><strong>Username uniqueness:</strong> Enforced by MongoDB unique index</li>
+      </ul>
+
+      <hr class="section-divider">
+
+      <h2>📊 Performance Optimizations</h2>
+
+      <h3>Canvas Rendering</h3>
+      <ul>
+        <li><strong>DOM reduction:</strong> 16,384 divs → 1 canvas element (~94% memory reduction)</li>
+        <li><strong>Hardware acceleration:</strong> CSS transforms leverage GPU</li>
+        <li><strong>No anti-aliasing:</strong> <code>imageSmoothingEnabled: false</code> for crisp pixels</li>
+      </ul>
+
+      <h3>Database Optimization</h3>
+      <ul>
+        <li><strong>Compound index:</strong> <code>(x, y)</code> on Pixel collection for O(1) lookups</li>
+        <li><strong>Upsert operations:</strong> Single query for pixel update/create</li>
+        <li><strong>Selective field queries:</strong> <code>.select()</code> reduces data transfer</li>
+      </ul>
+
+      <h3>Network Optimization</h3>
+      <ul>
+        <li><strong>WebSocket compression:</strong> Socket.IO compresses messages automatically</li>
+        <li><strong>Debounced inputs:</strong> Color picker saves debounced 500ms</li>
+        <li><strong>Optimistic rendering:</strong> Pixels painted immediately before server confirmation</li>
+      </ul>
+
+  
+      <hr class="section-divider">
+
+      <h2>🏁 Conclusion</h2>
+      <p>KromaVerse demonstrates a complete full-stack real-time web application with:</p>
+      <ul>
+        <li>Efficient real-time communication via WebSocket</li>
+        <li>Scalable database design with MongoDB</li>
+        <li>Performance-optimized canvas rendering</li>
+        <li>Turn-based rate limiting system</li>
+        <li>Secure user authentication and session management</li>
+        <li>Responsive UI with touch/mouse input handling</li>
+      </ul>
+      <p>The project successfully balances user experience, performance, and security while providing a foundation for future collaborative canvas features.</p>
+
+      <div class="info-box" style="margin-top:2rem;">
+        <strong>Project Repository:</strong> <a href="https://github.com/sea-deep/kromaverse" style="color:var(--accent-secondary);">github.com/sea-deep/kromaverse</a><br>
+        <strong>Live Demo:</strong> <a href="/" style="color:var(--accent-secondary);">Canvas Interface</a>
+      </div>
     </div>
   </main>
 </body>
