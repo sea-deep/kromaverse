@@ -185,20 +185,11 @@ if (gridCanvas && gridCtx) {
 // ===== CANVAS CLICK HANDLER =====
 if (gridCanvas) {
   gridCanvas.addEventListener('click', onCanvasClick);
-  gridCanvas.addEventListener('touchend', onCanvasClick);
 }
 
 // ===== ZOOM & PAN CONTROLS =====
 function updateTransform() {
   if (gridCanvas) {
-    // Calculate pan limits based on scale (allow some overflow for comfort)
-    const canvasSize = GRID_SIZE * CELL_SIZE * scale;
-    const maxPan = canvasSize * 0.75; // Allow panning up to 75% beyond edges
-    
-    // Clamp translate values
-    translateX = Math.max(-maxPan, Math.min(maxPan, translateX));
-    translateY = Math.max(-maxPan, Math.min(maxPan, translateY));
-    
     gridCanvas.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
   }
   zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
@@ -227,13 +218,31 @@ zoomOutBtn.addEventListener('click', () => {
 
 resetViewBtn.addEventListener('click', resetView);
 
-// Mouse wheel zoom
+// Wheel zoom with proper anchor point
 viewport.addEventListener('wheel', (e) => {
   e.preventDefault();
+  
+  // Get viewport dimensions and mouse position
+  const rect = viewport.getBoundingClientRect();
+  const viewportCenterX = rect.width / 2;
+  const viewportCenterY = rect.height / 2;
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  
+  // Calculate point in canvas space (relative to canvas center)
+  const pointX = (mouseX - viewportCenterX - translateX) / scale;
+  const pointY = (mouseY - viewportCenterY - translateY) / scale;
+  
+  // Calculate new scale
   const delta = -e.deltaY;
   const zoomFactor = delta > 0 ? 1.1 : 0.9;
+  const newScale = Math.max(0.5, Math.min(8, scale * zoomFactor));
   
-  scale = Math.max(0.5, Math.min(8, scale * zoomFactor));
+  // Adjust translation to keep the point under the mouse stationary
+  translateX = translateX * (newScale / scale) + (mouseX - viewportCenterX) * (1 - newScale / scale);
+  translateY = translateY * (newScale / scale) + (mouseY - viewportCenterY) * (1 - newScale / scale);
+  scale = newScale;
+  
   updateTransform();
 }, { passive: false });
 
@@ -263,33 +272,34 @@ window.addEventListener('mousemove', (e) => {
   updateTransform();
 });
 
-// Touch support for mobile
+// Touch support for mobile: single-finger pan + two-finger pinch zoom
 let lastTouchDistance = 0;
-let lastTouchX = 0;
-let lastTouchY = 0;
 let touchDragDistance = 0;
+let isPinching = false;
+let lastPinchMidX = 0;
+let lastPinchMidY = 0;
 
 viewport.addEventListener('touchstart', (e) => {
   touchDragDistance = 0;
   if (e.touches.length === 1) {
-    // Always allow panning start with single finger
     isPanning = true;
     startX = e.touches[0].clientX - translateX;
     startY = e.touches[0].clientY - translateY;
-    lastTouchX = e.touches[0].clientX;
-    lastTouchY = e.touches[0].clientY;
   } else if (e.touches.length === 2) {
-    // Two finger touch - zoom
     isPanning = false;
+    isPinching = true;
     const dx = e.touches[0].clientX - e.touches[1].clientX;
     const dy = e.touches[0].clientY - e.touches[1].clientY;
-    lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+    lastTouchDistance = Math.hypot(dx, dy);
+    
+    const rect = viewport.getBoundingClientRect();
+    lastPinchMidX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
+    lastPinchMidY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
   }
 }, { passive: false });
 
 viewport.addEventListener('touchmove', (e) => {
-  if (e.touches.length === 1 && isPanning) {
-    // Pan
+  if (e.touches.length === 1 && isPanning && !isPinching) {
     e.preventDefault();
     const newX = e.touches[0].clientX - startX;
     const newY = e.touches[0].clientY - startY;
@@ -298,29 +308,54 @@ viewport.addEventListener('touchmove', (e) => {
     translateY = newY;
     updateTransform();
   } else if (e.touches.length === 2) {
-    // Pinch zoom
     e.preventDefault();
+    isPinching = true;
+    
+    const rect = viewport.getBoundingClientRect();
+    const viewportCenterX = rect.width / 2;
+    const viewportCenterY = rect.height / 2;
+    
+    const midX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
+    const midY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
+    
     const dx = e.touches[0].clientX - e.touches[1].clientX;
     const dy = e.touches[0].clientY - e.touches[1].clientY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distance = Math.hypot(dx, dy);
     
     if (lastTouchDistance > 0) {
-      const delta = distance - lastTouchDistance;
-      const zoomFactor = 1 + (delta * 0.01);
-      scale = Math.max(0.5, Math.min(8, scale * zoomFactor));
+      // Calculate scale change
+      const scaleChange = distance / lastTouchDistance;
+      const newScale = Math.max(0.5, Math.min(8, scale * scaleChange));
+      
+      // Adjust translation to keep pinch midpoint stationary
+      const actualScaleChange = newScale / scale;
+      translateX = translateX * actualScaleChange + (midX - viewportCenterX) * (1 - actualScaleChange);
+      translateY = translateY * actualScaleChange + (midY - viewportCenterY) * (1 - actualScaleChange);
+      scale = newScale;
+      
       updateTransform();
     }
     
     lastTouchDistance = distance;
+    lastPinchMidX = midX;
+    lastPinchMidY = midY;
   }
 }, { passive: false });
 
 viewport.addEventListener('touchend', (e) => {
-  isPanning = false;
   if (e.touches.length < 2) {
     lastTouchDistance = 0;
+    // Wait a moment before allowing clicks after pinch
+    if (isPinching) {
+      setTimeout(() => { 
+        isPinching = false;
+        touchDragDistance = 0;
+      }, 300);
+    } else {
+      isPanning = false;
+    }
   }
-});
+}, { passive: false });
 
 // ===== AUTH HANDLERS =====
 btnReg.addEventListener('click', async () => {
@@ -578,9 +613,9 @@ function startRefillTimer() {
 
 // ===== HANDLE CANVAS CLICKS =====
 function onCanvasClick(e) {
-  // Prevent default to avoid double-firing on touch devices
-  if (e.type === 'touchend') {
-    e.preventDefault();
+  // Ignore if pinching or was recently pinching
+  if (isPinching) {
+    return;
   }
   
   // Ignore clicks that were actually drags
